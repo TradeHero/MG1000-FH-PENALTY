@@ -133,17 +133,17 @@ var Renderer = (function () {
             this.mainWindow.addSubview(backgroundImageView);
         },
 
-        renderGoalPostAndKeeper: function (keeperX) {
+        renderGoalPostAndKeeper: function () {
             var goalPostImage = Asset.images.goal_post;
             var goalPostImageViewX = Application.getCanvasWidth() / 2 - goalPostImage.width / 2;
             var goalPostImageView = new UI.ImageView(goalPostImageViewX, 60, goalPostImage.width, goalPostImage.height, goalPostImage);
             var goalkeeperImage = Asset.images.goalkeeper;
-            //var goalkeeperImageViewX = canvasWidth / 2 - goalkeeperImage.width / 2;
-            var guardMinX = goalPostImageViewX + goalPostImage.width * 0.05;
-            var guardMaxX = (guardMinX + goalPostImage.width * 0.9) - goalkeeperImage.width;
-            var keeperX = Math.random() * (guardMaxX - guardMinX) + guardMinX;
-            var goalkeeperImageView = new UI.ImageView(keeperX, 80, goalkeeperImage.width, goalkeeperImage.height, goalkeeperImage);
+            var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), 80, goalkeeperImage.width, goalkeeperImage.height, goalkeeperImage);
 
+            if (GameObjects.getGuardMaxX() === undefined) {
+                GameObjects.setGuardMinX(goalPostImageViewX + goalPostImage.width * 0.05);
+                GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + goalPostImage.width * 0.9) - goalkeeperImage.width);
+            }
             this.mainWindow.addSubview(goalPostImageView);
             this.mainWindow.addSubview(goalkeeperImageView);
         },
@@ -282,10 +282,52 @@ var GameObjects = (function () {
             var distance = Math.sqrt(dx * dx + dy * dy);
 
             return distance / this.getDragDuration();
+        },
+
+        resetBall: function () {
+            this.dragStartX = undefined;
+            this.dragStartY = undefined;
+            this.dragEndX = undefined;
+            this.dragEndY = undefined;
+            this.ballCurrentX = this.ballStartX;
+            this.ballCurrentY = this.ballStartY;
+            this.ballVelocity = undefined;
+            this.dragDuration = undefined;
         }
     };
 
     var _Keeper = {
+        guardMinX: undefined,
+        guardMaxX: undefined,
+        keeperX: undefined,
+
+        getGuardMinX: function () {
+            return this.guardMinX;
+        },
+
+        getGuardMaxX: function () {
+            return this.guardMaxX;
+        },
+
+        setGuardMinX: function (min) {
+            this.guardMinX = min;
+        },
+
+        setGuardMaxX: function (max) {
+            this.guardMaxX = max;
+        },
+
+        getKeeperX: function () {
+            return this.keeperX;
+        },
+
+        setKeeperX: function (x) {
+            this.keeperX = x;
+        },
+
+        getNewKeeperPosition: function () {
+            return Math.random() * (this.getGuardMaxX() - this.getGuardMinX()) + this.getGuardMinX();
+        }
     };
 
     return {
@@ -367,6 +409,38 @@ var GameObjects = (function () {
 
         getVelocity: function () {
             return _Ball.getVelocity();
+        },
+
+        getGuardMinX: function () {
+            return _Keeper.getGuardMinX();
+        },
+
+        getGuardMaxX: function () {
+            return _Keeper.getGuardMaxX();
+        },
+
+        setGuardMinX: function (min) {
+            return _Keeper.setGuardMinX(min);
+        },
+
+        setGuardMaxX: function (max) {
+            return _Keeper.setGuardMaxX(max);
+        },
+
+        getKeeperX: function () {
+            return _Keeper.getKeeperX();
+        },
+
+        setKeeperX: function (x) {
+            return _Keeper.setKeeperX(x);
+        },
+
+        getNewKeeperPosition: function () {
+            return _Keeper.getNewKeeperPosition();
+        },
+
+        resetBall: function () {
+            return _Ball.resetBall();
         }
     }
 })();
@@ -377,6 +451,8 @@ var Game = (function () {
         delta: 0,
         currentTime: 0,
         lastTime: 0,
+        keeperDirection: 1,
+        keeperTimer: 0,
 
         loop: function () {
             var self = this;
@@ -389,7 +465,26 @@ var Game = (function () {
             this.currentTime = Date.now();
             this.delta = (this.currentTime - this.lastTime) / 1000;
 
+            if (this.delta > 1) {
+                this.delta = 0;
+            }
+
+            this.keeperTimer += this.delta;
+
             Renderer.render();
+
+            if (GameObjects.getKeeperX() === undefined) {
+                GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
+            }
+
+            if (GameObjects.getKeeperX() >= GameObjects.getGuardMaxX()) {
+                this.keeperDirection = 1;
+            } else if (GameObjects.getKeeperX() <= GameObjects.getGuardMinX()) {
+                this.keeperDirection = -1;
+            }
+
+            GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * this.keeperDirection);
+
             Renderer.renderGoalPostAndKeeper();
 
             if (GameObjects.getDragEndX() !== undefined) {
@@ -403,6 +498,11 @@ var Game = (function () {
                 var yunits = Math.sin(radians) * this.delta * 500 * GameObjects.getVelocity();
                 GameObjects.setBallCurrentX(GameObjects.getBallCurrentX() + xunits);
                 GameObjects.setBallCurrentY(GameObjects.getBallCurrentY() + yunits);
+
+                if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentY() <= 0) {
+                    this.newShot();
+                }
+
                 Renderer.renderBall(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY());
             } else {
                 GameObjects.setBallCurrentX(GameObjects.getBallStartX());
@@ -411,6 +511,10 @@ var Game = (function () {
             }
 
             this.lastTime = this.currentTime;
+        },
+
+        newShot: function () {
+            GameObjects.resetBall();
         }
     };
 

@@ -35,11 +35,14 @@ var Input = (function () {
         //if (control !== undefined && control.enabled) {
         //
         //}
-        GameObjects.setDragDuration(duration);
-        GameObjects.setDragStartX(startX);
-        GameObjects.setDragStartY(startY);
-        GameObjects.setDragEndX(endX);
-        GameObjects.setDragEndY(endY);
+
+        if (GameObjects.getDragDuration() === undefined) {
+            GameObjects.setDragDuration(duration);
+            GameObjects.setDragStartX(startX);
+            GameObjects.setDragStartY(startY);
+            GameObjects.setDragEndX(endX);
+            GameObjects.setDragEndY(endY);
+        }
     };
 
     //public interface
