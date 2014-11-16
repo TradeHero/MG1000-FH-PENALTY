@@ -135,18 +135,21 @@ var Renderer = (function () {
 
         renderGoalPostAndKeeper: function () {
             var goalPostImage = Asset.images.goal_post;
+            var goalkeeperImage = Asset.images.goalkeeper;
 
             if (GameObjects.getGoalPostX() === undefined) {
                 GameObjects.setGoalPostX(Application.getCanvasWidth() / 2 - goalPostImage.width / 2);
                 GameObjects.setGoalPostY(60);
                 GameObjects.setGoalPostWidth(goalPostImage.width);
                 GameObjects.setGoalPostHeight(goalPostImage.height);
+                GameObjects.setKeeperWidth(goalkeeperImage.width);
+                GameObjects.setKeeperHeight(goalkeeperImage.height);
+                GameObjects.setKeeperY(80);
             }
 
             var goalPostImageView = new UI.ImageView(GameObjects.getGoalPostX(), GameObjects.getGoalPostY(),
                 GameObjects.getGoalPostWidth(), GameObjects.getGoalPostHeight(), goalPostImage);
-            var goalkeeperImage = Asset.images.goalkeeper;
-            var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), 80, goalkeeperImage.width, goalkeeperImage.height, goalkeeperImage);
+            var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), GameObjects.getKeeperY(), GameObjects.getKeeperWidth(), GameObjects.getKeeperHeight(), goalkeeperImage);
 
             if (GameObjects.getGuardMaxX() === undefined) {
                 GameObjects.setGuardMinX(GameObjects.getGoalPostX() + goalPostImage.width * 0.05);
@@ -156,14 +159,36 @@ var Renderer = (function () {
             this.mainWindow.addSubview(goalkeeperImageView);
         },
 
-        renderBall: function (x, y) {
+        renderBall: function () {
             var ballImage = Asset.images.ball;
-            var ball = new BallSprite(x, y, ballImage.width, ballImage.height, ballImage);
+
+            if (GameObjects.getBallWidth() === undefined) {
+                GameObjects.setBallWidth(ballImage.width);
+                GameObjects.setBallHeight(ballImage.height);
+                GameObjects.setBallCurrentX(GameObjects.getBallStartX());
+                GameObjects.setBallCurrentY(GameObjects.getBallStartY());
+            }
+
+            var ball = new BallSprite(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight(), ballImage);
             ball.addTarget(function () {
                 console.log("kick");
             }, "drag");
 
             this.mainWindow.addSubview(ball);
+        },
+
+        renderGoal: function () {
+            var goalText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 30, "GOAL!!");
+            goalText.font_size = "5";
+            goalText.text_color = "red";
+            this.mainWindow.addSubview(goalText);
+        },
+
+        renderMiss: function () {
+            var missText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 30, "MISS!!");
+            missText.font_size = "5";
+            missText.text_color = "red";
+            this.mainWindow.addSubview(missText);
         }
     };
 
@@ -177,12 +202,20 @@ var Renderer = (function () {
         },
         renderBall: function (x, y) {
             return _Renderer.renderBall(x, y);
+        },
+        renderGoal: function () {
+            return _Renderer.renderGoal();
+        },
+        renderMiss: function () {
+            return _Renderer.renderMiss();
         }
     }
 })();
 
 var GameObjects = (function () {
     var _Ball = {
+        ballWidth: undefined,
+        ballHeight: undefined,
         ballStartX: undefined,
         ballStartY: 480,
         dragStartX: undefined,
@@ -193,6 +226,22 @@ var GameObjects = (function () {
         ballCurrentY: undefined,
         ballVelocity: undefined,
         dragDuration: undefined,
+
+        getBallWidth: function () {
+            return this.ballWidth;
+        },
+
+        getBallHeight: function () {
+            return this.ballHeight;
+        },
+
+        setBallWidth: function (width) {
+            this.ballWidth = width;
+        },
+
+        setBallHeight: function (height) {
+            this.ballHeight = height;
+        },
 
         getDragStartX: function () {
             return this.dragStartX;
@@ -308,6 +357,25 @@ var GameObjects = (function () {
         guardMinX: undefined,
         guardMaxX: undefined,
         keeperX: undefined,
+        keeperY: undefined,
+        keeperWidth: undefined,
+        keeperHeight: undefined,
+
+        getKeeperWidth: function () {
+            return this.keeperWidth;
+        },
+
+        getKeeperHeight: function () {
+            return this.keeperHeight;
+        },
+
+        setKeeperWidth: function (width) {
+            this.keeperWidth = width;
+        },
+
+        setKeeperHeight: function (height) {
+            this.keeperHeight = height;
+        },
 
         getGuardMinX: function () {
             return this.guardMinX;
@@ -329,8 +397,16 @@ var GameObjects = (function () {
             return this.keeperX;
         },
 
+        getKeeperY: function () {
+            return this.keeperY;
+        },
+
         setKeeperX: function (x) {
             this.keeperX = x;
+        },
+
+        setKeeperY: function (y) {
+            this.keeperY = y;
         },
 
         getNewKeeperPosition: function () {
@@ -379,6 +455,22 @@ var GameObjects = (function () {
 
     return {
         // BALL
+        getBallWidth: function () {
+            return _Ball.getBallWidth();
+        },
+
+        getBallHeight: function () {
+            return _Ball.getBallHeight();
+        },
+
+        setBallWidth: function (width) {
+            return _Ball.setBallWidth(width);
+        },
+
+        setBallHeight: function (height) {
+            return _Ball.setBallHeight(height);
+        },
+
         getDragStartX: function () {
             return _Ball.getDragStartX();
         },
@@ -464,6 +556,22 @@ var GameObjects = (function () {
         },
 
         // KEEPER
+        getKeeperWidth: function () {
+            return _Keeper.getKeeperWidth();
+        },
+
+        getKeeperHeight: function () {
+            return _Keeper.getKeeperHeight();
+        },
+
+        setKeeperWidth: function (width) {
+            return _Keeper.setKeeperWidth(width);
+        },
+
+        setKeeperHeight: function (height) {
+            return _Keeper.setKeeperHeight(height);
+        },
+
         getGuardMaxX: function () {
             return _Keeper.getGuardMaxX();
         },
@@ -480,8 +588,16 @@ var GameObjects = (function () {
             return _Keeper.getKeeperX();
         },
 
+        getKeeperY: function () {
+            return _Keeper.getKeeperY();
+        },
+
         setKeeperX: function (x) {
             return _Keeper.setKeeperX(x);
+        },
+
+        setKeeperY: function (y) {
+            return _Keeper.setKeeperY(y);
         },
 
         getNewKeeperPosition: function () {
@@ -534,7 +650,8 @@ var Game = (function () {
         currentTime: 0,
         lastTime: 0,
         keeperDirection: 1,
-        keeperTimer: 0,
+        resultTimer: 0,
+        showingResult: false,
 
         loop: function () {
             var self = this;
@@ -551,8 +668,6 @@ var Game = (function () {
                 this.delta = 0;
             }
 
-            this.keeperTimer += this.delta;
-
             Renderer.render();
 
             if (GameObjects.getKeeperX() === undefined) {
@@ -565,33 +680,49 @@ var Game = (function () {
                 this.keeperDirection = -1;
             }
 
-            GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * this.keeperDirection);
+            if (!this.showingResult) {
+                GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * this.keeperDirection);
+            }
+
 
             Renderer.renderGoalPostAndKeeper();
 
             if (GameObjects.getDragEndX() !== undefined) {
-                var angle = GameObjects.getAngle() + 270;
+                if (!this.showingResult) {
+                    var angle = GameObjects.getAngle() + 270;
 
-                if (angle > 359) {
-                    angle -= 360
-                }
-                var radians = angle * Math.PI / 180;
-                var xunits = Math.cos(radians) * this.delta * 500 * GameObjects.getVelocity();
-                var yunits = Math.sin(radians) * this.delta * 500 * GameObjects.getVelocity();
-                GameObjects.setBallCurrentX(GameObjects.getBallCurrentX() + xunits);
-                GameObjects.setBallCurrentY(GameObjects.getBallCurrentY() + yunits);
-                console.log(Application.getCanvasWidth);
-                if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentY() <= 0 + GameObjects.getGoalPostY()
-                    || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
-                    this.newShot();
+                    if (angle > 359) {
+                        angle -= 360
+                    }
+                    var radians = angle * Math.PI / 180;
+                    var xunits = Math.cos(radians) * this.delta * 500 * GameObjects.getVelocity();
+                    var yunits = Math.sin(radians) * this.delta * 500 * GameObjects.getVelocity();
+                    GameObjects.setBallCurrentX(GameObjects.getBallCurrentX() + xunits);
+                    GameObjects.setBallCurrentY(GameObjects.getBallCurrentY() + yunits);
                 }
 
-                Renderer.renderBall(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY());
-            } else {
-                GameObjects.setBallCurrentX(GameObjects.getBallStartX());
-                GameObjects.setBallCurrentY(GameObjects.getBallStartY());
-                Renderer.renderBall(GameObjects.getBallStartX(), GameObjects.getBallStartY());
+                // keeper catch the ball.
+                if (GameObjects.getBallCurrentX() > GameObjects.getKeeperX() - 20 && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getKeeperX() + GameObjects.getKeeperWidth() + 20
+                    && GameObjects.getBallCurrentY() < GameObjects.getKeeperY() + GameObjects.getKeeperHeight() && GameObjects.getBallCurrentY() > GameObjects.getKeeperY()) {
+                    this.showMissShot();
+                    console.log("1");
+                }
+
+                // out of bound - miss shot
+                else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
+                    this.showMissShot();
+                    console.log("3");
+                }
+
+                // win
+                else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
+                    && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
+                    this.showShotIn();
+                    console.log("2");
+                }
             }
+
+            Renderer.renderBall();
 
             this.lastTime = this.currentTime;
         },
@@ -601,11 +732,27 @@ var Game = (function () {
         },
 
         showShotIn: function () {
+            Renderer.renderGoal();
+            this.showingResult = true;
+            this.resultTimer += this.delta;
 
+            if (this.resultTimer > 1) {
+                this.showingResult = false;
+                this.resultTimer = 0;
+                this.newShot();
+            }
         },
 
         showMissShot: function () {
+            Renderer.renderMiss();
+            this.showingResult = true;
+            this.resultTimer += this.delta;
 
+            if (this.resultTimer > 1) {
+                this.showingResult = false;
+                this.resultTimer = 0;
+                this.newShot();
+            }
         }
     };
 
