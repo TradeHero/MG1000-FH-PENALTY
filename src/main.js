@@ -135,13 +135,21 @@ var Renderer = (function () {
 
         renderGoalPostAndKeeper: function () {
             var goalPostImage = Asset.images.goal_post;
-            var goalPostImageViewX = Application.getCanvasWidth() / 2 - goalPostImage.width / 2;
-            var goalPostImageView = new UI.ImageView(goalPostImageViewX, 60, goalPostImage.width, goalPostImage.height, goalPostImage);
+
+            if (GameObjects.getGoalPostX() === undefined) {
+                GameObjects.setGoalPostX(Application.getCanvasWidth() / 2 - goalPostImage.width / 2);
+                GameObjects.setGoalPostY(60);
+                GameObjects.setGoalPostWidth(goalPostImage.width);
+                GameObjects.setGoalPostHeight(goalPostImage.height);
+            }
+
+            var goalPostImageView = new UI.ImageView(GameObjects.getGoalPostX(), GameObjects.getGoalPostY(),
+                GameObjects.getGoalPostWidth(), GameObjects.getGoalPostHeight(), goalPostImage);
             var goalkeeperImage = Asset.images.goalkeeper;
             var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), 80, goalkeeperImage.width, goalkeeperImage.height, goalkeeperImage);
 
             if (GameObjects.getGuardMaxX() === undefined) {
-                GameObjects.setGuardMinX(goalPostImageViewX + goalPostImage.width * 0.05);
+                GameObjects.setGuardMinX(GameObjects.getGoalPostX() + goalPostImage.width * 0.05);
                 GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + goalPostImage.width * 0.9) - goalkeeperImage.width);
             }
             this.mainWindow.addSubview(goalPostImageView);
@@ -330,7 +338,47 @@ var GameObjects = (function () {
         }
     };
 
+    var _GoalPost = {
+        goalPostX: undefined,
+        goalPostY: undefined,
+        goalPostWidth: undefined,
+        goalPostHeight: undefined,
+
+        getGoalPostX: function () {
+            return this.goalPostX;
+        },
+
+        setGoalPostX: function (x) {
+            this.goalPostX = x;
+        },
+
+        getGoalPostY: function () {
+            return this.goalPostY;
+        },
+
+        setGoalPostY: function (y) {
+            this.goalPostY = y;
+        },
+
+        getGoalPostWidth: function () {
+            return this.goalPostWidth;
+        },
+
+        setGoalPostWidth: function (width) {
+            this.goalPostWidth = width;
+        },
+
+        getGoalPostHeight: function () {
+            return this.goalPostHeight;
+        },
+
+        setGoalPostHeight: function (height) {
+            this.goalPostHeight = height;
+        }
+    };
+
     return {
+        // BALL
         getDragStartX: function () {
             return _Ball.getDragStartX();
         },
@@ -415,6 +463,7 @@ var GameObjects = (function () {
             return _Keeper.getGuardMinX();
         },
 
+        // KEEPER
         getGuardMaxX: function () {
             return _Keeper.getGuardMaxX();
         },
@@ -441,6 +490,39 @@ var GameObjects = (function () {
 
         resetBall: function () {
             return _Ball.resetBall();
+        },
+
+        // GOALPOST
+        getGoalPostX: function () {
+            return _GoalPost.getGoalPostX();
+        },
+
+        setGoalPostX: function (x) {
+            return _GoalPost.setGoalPostX(x);
+        },
+
+        getGoalPostY: function () {
+            return _GoalPost.getGoalPostY();
+        },
+
+        setGoalPostY: function (y) {
+            return _GoalPost.setGoalPostY(y);
+        },
+
+        getGoalPostWidth: function () {
+            return _GoalPost.getGoalPostWidth();
+        },
+
+        setGoalPostWidth: function (width) {
+            return _GoalPost.setGoalPostWidth(width);
+        },
+
+        getGoalPostHeight: function () {
+            return _GoalPost.getGoalPostHeight();
+        },
+
+        setGoalPostHeight: function (height) {
+            return _GoalPost.setGoalPostHeight(height);
         }
     }
 })();
@@ -498,8 +580,9 @@ var Game = (function () {
                 var yunits = Math.sin(radians) * this.delta * 500 * GameObjects.getVelocity();
                 GameObjects.setBallCurrentX(GameObjects.getBallCurrentX() + xunits);
                 GameObjects.setBallCurrentY(GameObjects.getBallCurrentY() + yunits);
-
-                if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentY() <= 0) {
+                console.log(Application.getCanvasWidth);
+                if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentY() <= 0 + GameObjects.getGoalPostY()
+                    || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
                     this.newShot();
                 }
 
@@ -515,6 +598,14 @@ var Game = (function () {
 
         newShot: function () {
             GameObjects.resetBall();
+        },
+
+        showShotIn: function () {
+
+        },
+
+        showMissShot: function () {
+
         }
     };
 
