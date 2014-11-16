@@ -22,22 +22,21 @@ window.requestAnimFrame = (function () {
 })();
 
 var Application = (function () {
-    var WIDTH = 800;
-    var HEIGHT = 600;
-    var GAME_RATIO = WIDTH / HEIGHT;
 
     var _Application = {
+        ratio: 800/600,
+        width: undefined,
+        height: undefined,
+        scale: undefined,
         canvas: undefined,
         ctx: undefined,
         init: function () {
-
-            //var canvasWidth = window.innerWidth;
-            var canvasWidth = 800;
-            //var canvasHeight = canvasWidth * GAME_RATIO;
-            var canvasHeight = 600;
+            this.width = window.innerWidth;
+            this.height = this.width / this.ratio;
+            this.scale = this.width / 800;
             this.canvas = document.createElement("canvas");
-            this.canvas.width = canvasWidth;
-            this.canvas.height = canvasHeight;
+            this.canvas.width = this.width;
+            this.canvas.height = this.height;
             this.ctx = this.canvas.getContext("2d");
 
             var body = document.body;
@@ -81,12 +80,16 @@ var Application = (function () {
 
         getCanvasWidth: function () {
             //return window.innerWidth;
-            return 800;
+            return window.innerWidth;
         },
 
         getCanvasHeight: function () {
             //return window.innerHeight * GAME_RATIO;
-            return 600;
+            return this.height;
+        },
+
+        getScale: function () {
+            return this.scale;
         },
 
         getCanvas: function () {
@@ -111,8 +114,71 @@ var Application = (function () {
         getCanvasCtx: function () {
             return _Application.getCanvasCtx();
         },
+        getScale: function () {
+            return _Application.getScale();
+        },
         getCanvas: function () {
             return _Application.getCanvas();
+        }
+    };
+})();
+
+var ScoreCanvas = (function () {
+    var width = window.innerWidth;
+    var height = 200;
+
+    var _ScoreCanvas = {
+        canvas: undefined,
+        ctx: undefined,
+        init: function () {
+
+            //var canvasWidth = window.innerWidth;
+            var canvasWidth = width;
+            //var canvasHeight = canvasWidth * GAME_RATIO;
+            var canvasHeight = height;
+            this.canvas = document.createElement("canvas");
+            this.canvas.width = canvasWidth;
+            this.canvas.height = canvasHeight;
+            this.ctx = this.canvas.getContext("2d");
+
+            var body = document.body;
+            body.appendChild(this.canvas);
+        },
+
+        getCanvasWidth: function () {
+            //return window.innerWidth;
+            return width;
+        },
+
+        getCanvasHeight: function () {
+            //return window.innerHeight * GAME_RATIO;
+            return height;
+        },
+
+        getCanvas: function () {
+            return this.canvas;
+        },
+
+        getCanvasCtx: function () {
+            return this.ctx;
+        }
+    };
+
+    return {
+        init: function () {
+            return _ScoreCanvas.init();
+        },
+        getCanvasWidth: function () {
+            return _ScoreCanvas.getCanvasWidth();
+        },
+        getCanvasHeight: function () {
+            return _ScoreCanvas.getCanvasHeight();
+        },
+        getCanvasCtx: function () {
+            return _ScoreCanvas.getCanvasCtx();
+        },
+        getCanvas: function () {
+            return _ScoreCanvas.getCanvas();
         }
     };
 })();
@@ -125,6 +191,7 @@ var Renderer = (function () {
             this.mainWindow = new UI.View(0, 0, Application.getCanvasWidth(), Application.getCanvasHeight());
             this.mainWindow.drawView(Application.getCanvasCtx());
             GameObjects.setBallStartX(Application.getCanvasWidth() / 2 - Asset.images.ball.width / 2);
+            GameObjects.setBallStartY(480 * Application.getScale());
 
             var canvasWidth = Application.getCanvasWidth();
             var canvasHeight = Application.getCanvasHeight();
@@ -138,13 +205,13 @@ var Renderer = (function () {
             var goalkeeperImage = Asset.images.goalkeeper;
 
             if (GameObjects.getGoalPostX() === undefined) {
-                GameObjects.setGoalPostX(Application.getCanvasWidth() / 2 - goalPostImage.width / 2);
-                GameObjects.setGoalPostY(60);
-                GameObjects.setGoalPostWidth(goalPostImage.width);
-                GameObjects.setGoalPostHeight(goalPostImage.height);
-                GameObjects.setKeeperWidth(goalkeeperImage.width);
-                GameObjects.setKeeperHeight(goalkeeperImage.height);
-                GameObjects.setKeeperY(80);
+                GameObjects.setGoalPostWidth(goalPostImage.width * Application.getScale());
+                GameObjects.setGoalPostHeight(goalPostImage.height * Application.getScale());
+                GameObjects.setGoalPostX(Application.getCanvasWidth() / 2 - GameObjects.getGoalPostWidth() / 2);
+                GameObjects.setGoalPostY(60 * Application.getScale());
+                GameObjects.setKeeperWidth(goalkeeperImage.width * Application.getScale());
+                GameObjects.setKeeperHeight(goalkeeperImage.height * Application.getScale());
+                GameObjects.setKeeperY(80 * Application.getScale());
             }
 
             var goalPostImageView = new UI.ImageView(GameObjects.getGoalPostX(), GameObjects.getGoalPostY(),
@@ -152,8 +219,8 @@ var Renderer = (function () {
             var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), GameObjects.getKeeperY(), GameObjects.getKeeperWidth(), GameObjects.getKeeperHeight(), goalkeeperImage);
 
             if (GameObjects.getGuardMaxX() === undefined) {
-                GameObjects.setGuardMinX(GameObjects.getGoalPostX() + goalPostImage.width * 0.05);
-                GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + goalPostImage.width * 0.9) - goalkeeperImage.width);
+                GameObjects.setGuardMinX(GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth() * 0.05);
+                GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + GameObjects.getGoalPostWidth() * 0.9) - GameObjects.getKeeperWidth());
             }
             this.mainWindow.addSubview(goalPostImageView);
             this.mainWindow.addSubview(goalkeeperImageView);
@@ -163,17 +230,13 @@ var Renderer = (function () {
             var ballImage = Asset.images.ball;
 
             if (GameObjects.getBallWidth() === undefined) {
-                GameObjects.setBallWidth(ballImage.width);
-                GameObjects.setBallHeight(ballImage.height);
+                GameObjects.setBallWidth(ballImage.width * Application.getScale());
+                GameObjects.setBallHeight(ballImage.height * Application.getScale());
                 GameObjects.setBallCurrentX(GameObjects.getBallStartX());
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
             }
 
             var ball = new BallSprite(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight(), ballImage);
-            ball.addTarget(function () {
-                console.log("kick");
-            }, "drag");
-
             this.mainWindow.addSubview(ball);
         },
 
@@ -189,6 +252,42 @@ var Renderer = (function () {
             missText.font_size = "5";
             missText.text_color = "red";
             this.mainWindow.addSubview(missText);
+        },
+
+        renderGameOver: function () {
+            var gameOverText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 50, "Need to show share dialog");
+            gameOverText.font_size = "5";
+            gameOverText.text_color = "red";
+            this.mainWindow.addSubview(gameOverText);
+        },
+
+        renderScore: function () {
+            var mainWindow = new UI.View(0, 0, ScoreCanvas.getCanvasWidth(), ScoreCanvas.getCanvasHeight());
+            mainWindow.background_color = "black";
+            var scoreLabel = new UI.Label(200, ScoreCanvas.getCanvasHeight() / 2, 200, 30, "Scores");
+            scoreLabel.text_color = "white";
+            scoreLabel.font_size = 4;
+            mainWindow.drawView(ScoreCanvas.getCanvasCtx());
+            scoreLabel.drawView(ScoreCanvas.getCanvasCtx());
+
+            var scores = GameObjects.getScores();
+            var ballImage = Asset.images.ball;
+            var startX = 400;
+            var mark = new UI.ImageView(startX, ScoreCanvas.getCanvasHeight() / 2 - ballImage.height, ballImage.width * 2, ballImage.height * 2, ballImage);
+
+            for (var i in scores) {
+                if (scores.hasOwnProperty(i)) {
+                    if (scores[i] === 1) {
+                        mark.alpha = 1.0;
+                    } else if (scores[i] === 0) {
+                        mark.alpha = 0.3;
+                    }
+
+                    mark.drawView(ScoreCanvas.getCanvasCtx());
+                    mark.x += ballImage.width * 2 + 50;
+
+                }
+            }
         }
     };
 
@@ -208,6 +307,12 @@ var Renderer = (function () {
         },
         renderMiss: function () {
             return _Renderer.renderMiss();
+        },
+        renderGameOver: function () {
+            return _Renderer.renderGameOver();
+        },
+        renderScore: function () {
+            return _Renderer.renderScore();
         }
     }
 })();
@@ -217,7 +322,7 @@ var GameObjects = (function () {
         ballWidth: undefined,
         ballHeight: undefined,
         ballStartX: undefined,
-        ballStartY: 480,
+        ballStartY: undefined,
         dragStartX: undefined,
         dragStartY: undefined,
         dragEndX: undefined,
@@ -453,6 +558,32 @@ var GameObjects = (function () {
         }
     };
 
+    var _Score = {
+        chance: 3,
+        currentKick: 0,
+        scores: [],
+
+        getChance: function () {
+            return this.chance;
+        },
+
+        getCurrentKick: function () {
+            return this.currentKick;
+        },
+
+        setCurrentKick: function (k) {
+            this.currentKick = k;
+        },
+
+        getScores: function () {
+            return this.scores;
+        },
+
+        setScores: function (score) {
+            this.scores[this.currentKick] = score;
+        }
+    };
+
     return {
         // BALL
         getBallWidth: function () {
@@ -639,6 +770,27 @@ var GameObjects = (function () {
 
         setGoalPostHeight: function (height) {
             return _GoalPost.setGoalPostHeight(height);
+        },
+
+        // Score
+        getChance: function () {
+            return _Score.getChance();
+        },
+
+        getCurrentKick: function () {
+            return _Score.getCurrentKick();
+        },
+
+        setCurrentKick: function (k) {
+            return _Score.setCurrentKick(k);
+        },
+
+        getScores: function () {
+            return _Score.getScores();
+        },
+
+        setScores: function (score) {
+            return _Score.setScores(score);
         }
     }
 })();
@@ -668,8 +820,6 @@ var Game = (function () {
                 this.delta = 0;
             }
 
-            Renderer.render();
-
             if (GameObjects.getKeeperX() === undefined) {
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
             }
@@ -680,15 +830,15 @@ var Game = (function () {
                 this.keeperDirection = -1;
             }
 
-            if (!this.showingResult) {
-                GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * this.keeperDirection);
+            if (!this.showingResult && GameObjects.getCurrentKick() < 3) {
+                GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
             }
 
-
+            Renderer.render();
             Renderer.renderGoalPostAndKeeper();
 
             if (GameObjects.getDragEndX() !== undefined) {
-                if (!this.showingResult) {
+                if (!this.showingResult && GameObjects.getCurrentKick() < 3) {
                     var angle = GameObjects.getAngle() + 270;
 
                     if (angle > 359) {
@@ -722,7 +872,12 @@ var Game = (function () {
                 }
             }
 
+            if (GameObjects.getCurrentKick() === 3) {
+                Renderer.renderGameOver();
+            }
+
             Renderer.renderBall();
+            Renderer.renderScore();
 
             this.lastTime = this.currentTime;
         },
@@ -737,6 +892,9 @@ var Game = (function () {
             this.resultTimer += this.delta;
 
             if (this.resultTimer > 1) {
+                var kick = GameObjects.getCurrentKick() + 1;
+                GameObjects.setScores(1);
+                GameObjects.setCurrentKick(kick);
                 this.showingResult = false;
                 this.resultTimer = 0;
                 this.newShot();
@@ -749,6 +907,10 @@ var Game = (function () {
             this.resultTimer += this.delta;
 
             if (this.resultTimer > 1) {
+                var kick = GameObjects.getCurrentKick() + 1;
+                GameObjects.setScores(0);
+                GameObjects.setCurrentKick(kick);
+
                 this.showingResult = false;
                 this.resultTimer = 0;
                 this.newShot();
@@ -763,6 +925,7 @@ var Game = (function () {
     }
 })();
 
+window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', Application.init, false);
 
 function inherit(proto) {

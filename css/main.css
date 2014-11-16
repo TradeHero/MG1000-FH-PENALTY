@@ -17,3 +17,11 @@ canvas {
     margin-right: auto;
     display: block;
 }
+
+#content {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    font-size: 60px;
+    font-family: 'Helvetica Neue';
+    text-align: center;
+}
