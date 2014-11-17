@@ -294,7 +294,9 @@ var Renderer = (function () {
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
             }
 
-            var ball = new BallSprite(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight(), ballImage);
+            var ball = new UI.Button(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight());
+            ball.image = ballImage;
+            ball.label.text = "";
             this.mainWindow.addSubview(ball);
         },
 

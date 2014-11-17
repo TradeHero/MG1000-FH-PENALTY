@@ -4,7 +4,12 @@ module.exports = function (grunt) {
     var sourceFiles, unitTestFiles, config;
     //  order is important
     sourceFiles = [
-        'src/main.js'
+        'src/lib/thcanvas-v0.1.0.min.js',
+        'src/main.js',
+        'src/util/input.js',
+        'src/ui/base.js',
+        'src/ui/view.js',
+        'src/ui/control.js'
     ];
     unitTestFiles = [];
     // Project configuration.
