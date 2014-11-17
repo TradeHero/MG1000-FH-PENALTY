@@ -21,10 +21,30 @@ window.requestAnimFrame = (function () {
     };
 })();
 
+Assets.initialise({
+    full_background: "assets/full_background.png",
+    background: "assets/img-bkg.png",
+    goal_post: "assets/img-goalpost.png",
+    goalkeeper: "assets/img-goalkeeper.png",
+    ball: "assets/img-ball.png"
+}, function () {
+    //completion callback
+    StartScene.init();
+});
+
+function inherit(proto) {
+    function F() {
+    }
+
+    F.prototype = proto;
+    return new F
+}
+
+
 var Application = (function () {
 
     var _Application = {
-        ratio: 800/600,
+        ratio: 800 / 600,
         width: undefined,
         height: undefined,
         scale: undefined,
@@ -94,7 +114,7 @@ var Application = (function () {
 
             }, false);
 
-            Asset.downloadAll();
+            Assets.beginLoad();
         },
 
         getCanvasWidth: function () {
@@ -209,19 +229,19 @@ var Renderer = (function () {
         render: function () {
             this.mainWindow = new UI.View(0, 0, Application.getCanvasWidth(), Application.getCanvasHeight());
             this.mainWindow.drawView(Application.getCanvasCtx());
-            GameObjects.setBallStartX(Application.getCanvasWidth() / 2 - Asset.images.ball.width / 2);
+            GameObjects.setBallStartX(Application.getCanvasWidth() / 2 - Assets.images().ball.width / 2);
             GameObjects.setBallStartY(480 * Application.getScale());
 
             var canvasWidth = Application.getCanvasWidth();
             var canvasHeight = Application.getCanvasHeight();
-            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Asset.images.background);
+            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().background);
 
             this.mainWindow.addSubview(backgroundImageView);
         },
 
         renderGoalPostAndKeeper: function () {
-            var goalPostImage = Asset.images.goal_post;
-            var goalkeeperImage = Asset.images.goalkeeper;
+            var goalPostImage = Assets.images().goal_post;
+            var goalkeeperImage = Assets.images().goalkeeper;
 
             if (GameObjects.getGoalPostX() === undefined) {
                 GameObjects.setGoalPostWidth(goalPostImage.width * Application.getScale());
@@ -246,7 +266,7 @@ var Renderer = (function () {
         },
 
         renderBall: function () {
-            var ballImage = Asset.images.ball;
+            var ballImage = Assets.images().ball;
 
             if (GameObjects.getBallWidth() === undefined) {
                 GameObjects.setBallWidth(ballImage.width * Application.getScale());
@@ -260,21 +280,21 @@ var Renderer = (function () {
         },
 
         renderGoal: function () {
-            var goalText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 30, "GOAL!!");
+            var goalText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "GOAL!!");
             goalText.font_size = "5";
             goalText.text_color = "red";
             this.mainWindow.addSubview(goalText);
         },
 
         renderMiss: function () {
-            var missText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 30, "MISS!!");
+            var missText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "MISS!!");
             missText.font_size = "5";
             missText.text_color = "red";
             this.mainWindow.addSubview(missText);
         },
 
         renderGameOver: function () {
-            var gameOverText = new UI.Label(Application.getCanvasWidth() /2, Application.getCanvasHeight()/2, Application.getCanvasWidth() /2, 50, "Need to show share dialog");
+            var gameOverText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 50, "Need to show share dialog");
             gameOverText.font_size = "5";
             gameOverText.text_color = "red";
             this.mainWindow.addSubview(gameOverText);
@@ -290,7 +310,7 @@ var Renderer = (function () {
             scoreLabel.drawView(ScoreCanvas.getCanvasCtx());
 
             var scores = GameObjects.getScores();
-            var ballImage = Asset.images.ball;
+            var ballImage = Assets.images().ball;
             var startX = 400;
             var mark = new UI.ImageView(startX, ScoreCanvas.getCanvasHeight() / 2 - ballImage.height, ballImage.width * 2, ballImage.height * 2, ballImage);
 
@@ -825,7 +845,7 @@ var StartScene = (function () {
 
             var canvasWidth = Application.getCanvasWidth();
             var canvasHeight = Application.getCanvasHeight();
-            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Asset.images.full_background);
+            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().full_background);
 
             var startButtonWidth = Application.getCanvasWidth() * 0.6;
             var startButtonHeight = startButtonWidth / 4;
@@ -981,10 +1001,3 @@ var Game = (function () {
 window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', Application.init, false);
 
-function inherit(proto) {
-    function F() {
-    }
-
-    F.prototype = proto;
-    return new F
-}
