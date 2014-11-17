@@ -49,14 +49,14 @@ var Application = (function () {
             // listen for clicks
             window.addEventListener('click', function (e) {
                 e.preventDefault();
-                //Input.trigger(e);
+                Input.trigger(e);
             }, false);
 
             // listen for touches
             window.addEventListener('touchstart', function (e) {
                 e.preventDefault();
                 // first touch from the event
-                //INPUT.trigger(e.touches[0]);
+                Input.trigger(e.touches[0]);
                 startTouchX = e.touches[0].pageX;
                 startTouchY = e.touches[0].pageY;
                 startTime = Date.now();
@@ -71,6 +71,25 @@ var Application = (function () {
                 if (startTouchX !== e.changedTouches[0].pageX || startTouchY !== e.changedTouches[0].pageY) {
                     var duration = Date.now() - startTime;
                     Input.drag(startTouchX, startTouchY, e.changedTouches[0].pageX, e.changedTouches[0].pageY, duration);
+                }
+
+            }, false);
+
+            window.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+                // first touch from the event
+                //INPUT.trigger(e.touches[0]);
+                startTouchX = e.pageX;
+                startTouchY = e.pageY;
+                startTime = Date.now();
+            }, false);
+
+            window.addEventListener('mouseup', function (e) {
+                // as above
+                e.preventDefault();
+                if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
+                    var duration = Date.now() - startTime;
+                    Input.drag(startTouchX, startTouchY, e.pageX, e.pageY, duration);
                 }
 
             }, false);
@@ -795,6 +814,43 @@ var GameObjects = (function () {
     }
 })();
 
+var StartScene = (function () {
+    var _Start = {
+        mainWindow: undefined,
+
+        init: function () {
+            Renderer.renderScore();
+            this.mainWindow = new UI.View(0, 0, Application.getCanvasWidth(), Application.getCanvasHeight());
+            this.mainWindow.drawView(Application.getCanvasCtx());
+
+            var canvasWidth = Application.getCanvasWidth();
+            var canvasHeight = Application.getCanvasHeight();
+            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Asset.images.full_background);
+
+            var startButtonWidth = Application.getCanvasWidth() * 0.6;
+            var startButtonHeight = startButtonWidth / 4;
+            var startButtonX = Application.getCanvasWidth() / 2 - startButtonWidth / 2;
+            var startButtonY = Application.getCanvasHeight() * 0.6;
+            var startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
+            startButton.cornerRadius = 35;
+            startButton.label.text = "Start";
+            startButton.label.font_size = "4";
+            startButton.addTarget(function () {
+                Game.loop();
+            }, "touch");
+
+            this.mainWindow.addSubview(backgroundImageView);
+            this.mainWindow.addSubview(startButton);
+        }
+    };
+
+    return {
+        init: function () {
+            return _Start.init();
+        }
+    }
+})();
+
 var Game = (function () {
     var _Game = {
         // time for calculate fps, max on 60 due to rAF
@@ -850,26 +906,6 @@ var Game = (function () {
                     GameObjects.setBallCurrentX(GameObjects.getBallCurrentX() + xunits);
                     GameObjects.setBallCurrentY(GameObjects.getBallCurrentY() + yunits);
                 }
-
-                // keeper catch the ball.
-                if (GameObjects.getBallCurrentX() > GameObjects.getKeeperX() - 20 && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getKeeperX() + GameObjects.getKeeperWidth() + 20
-                    && GameObjects.getBallCurrentY() < GameObjects.getKeeperY() + GameObjects.getKeeperHeight() && GameObjects.getBallCurrentY() > GameObjects.getKeeperY()) {
-                    this.showMissShot();
-                    console.log("1");
-                }
-
-                // out of bound - miss shot
-                else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
-                    this.showMissShot();
-                    console.log("3");
-                }
-
-                // win
-                else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
-                    && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
-                    this.showShotIn();
-                    console.log("2");
-                }
             }
 
             if (GameObjects.getCurrentKick() === 3) {
@@ -878,6 +914,23 @@ var Game = (function () {
 
             Renderer.renderBall();
             Renderer.renderScore();
+
+            // keeper catch the ball.
+            if (GameObjects.getBallCurrentX() > GameObjects.getKeeperX() - 20 && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getKeeperX() + GameObjects.getKeeperWidth() + 20
+                && GameObjects.getBallCurrentY() < GameObjects.getKeeperY() + GameObjects.getKeeperHeight() && GameObjects.getBallCurrentY() > GameObjects.getKeeperY()) {
+                this.showMissShot();
+            }
+
+            // out of bound - miss shot
+            else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
+                this.showMissShot();
+            }
+
+            // win
+            else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
+                && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
+                this.showShotIn();
+            }
 
             this.lastTime = this.currentTime;
         },

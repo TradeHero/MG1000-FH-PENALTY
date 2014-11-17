@@ -19,8 +19,8 @@ var Input = (function () {
     };
 
     var _trigger = function (data) {
-        this.x = (data.pageX - Application.getCanvas().offset.left);
-        this.y = (data.pageY - Application.getCanvas().offset.top);
+        this.x = (data.pageX - Application.getCanvas().offsetLeft);
+        this.y = (data.pageY - Application.getCanvas().offsetTop);
 
         var control = _intersect(this.x, this.y);
 

@@ -2,6 +2,7 @@ var Asset;
 Asset = (function () {
     // images dictionary
     this.images = {
+        "full_background": "assets/full_background.png",
         "background": "assets/img-bkg.png",
         "goal_post": "assets/img-goalpost.png",
         "goalkeeper": "assets/img-goalkeeper.png",
@@ -61,5 +62,6 @@ Asset = (function () {
     };
 })();
 Asset.finished = function () {
-    Game.loop();
+    StartScene.init();
+    //Game.loop();
 };
