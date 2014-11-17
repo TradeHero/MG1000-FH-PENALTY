@@ -19,5 +19,51 @@
 <body>
     <img src="assets/fh-logo.svg" id="logo" style="width: 800px "/>
     <p id="content">Earn more points for Ryne Cheow!</p>
+
+    <script>
+        function statusChangeCallback(response) {
+            var uri = encodeURI('http://192.168.1.82:8000');
+
+            if (response.status === 'connected') {
+                // redirect user to mini game.
+                window.location.href = uri + "&access_token=" + response["authResponse"]["accessToken"]
+            } else if (response.status === 'not_authorized') {
+                // The person is logged into Facebook, but not your app.
+                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,user_birthday,publish_actions&response_type=token");
+            } else {
+                // The person is not logged into Facebook, so we're not sure if
+                // they are logged into this app or not.
+                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,user_birthday,publish_actions&response_type=token");
+            }
+        }
+
+        function checkLoginState() {
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '772954419408981',
+                cookie: true,
+                xfbml: true,
+                version: 'v1.1'
+            });
+
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        };
+
+        // Load the SDK asyn
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
 </body>
 </html>

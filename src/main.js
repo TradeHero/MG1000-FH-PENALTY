@@ -48,10 +48,18 @@ var Application = (function () {
         width: undefined,
         height: undefined,
         scale: undefined,
+        mobileScale: undefined,
         canvas: undefined,
         ctx: undefined,
         init: function () {
             this.width = window.innerWidth;
+
+            if (!Utility.isMobile.any()) {
+                this.width = window.innerWidth * 0.6;
+            } else {
+                this.mobileScale = 1.7;
+            }
+
             this.height = this.width / this.ratio;
             this.scale = this.width / 800;
             this.canvas = document.createElement("canvas");
@@ -119,7 +127,7 @@ var Application = (function () {
 
         getCanvasWidth: function () {
             //return window.innerWidth;
-            return window.innerWidth;
+            return this.width;
         },
 
         getCanvasHeight: function () {
@@ -137,6 +145,10 @@ var Application = (function () {
 
         getCanvasCtx: function () {
             return this.ctx;
+        },
+
+        getMobileScale: function () {
+            return this.mobileScale;
         }
     };
 
@@ -158,6 +170,9 @@ var Application = (function () {
         },
         getCanvas: function () {
             return _Application.getCanvas();
+        },
+        getMobileScale: function () {
+            return _Application.getMobileScale();
         }
     };
 })();
@@ -165,6 +180,10 @@ var Application = (function () {
 var ScoreCanvas = (function () {
     var width = window.innerWidth;
     var height = 200;
+
+    if (!Utility.isMobile.any()) {
+        width = window.innerWidth * 0.6;
+    }
 
     var _ScoreCanvas = {
         canvas: undefined,
@@ -865,10 +884,62 @@ var StartScene = (function () {
     };
 
     return {
+        mainWindow: undefined,
+
         init: function () {
             return _Start.init();
         }
     }
+})();
+
+var ResultScene = (function (){
+    var _Result = {
+        init: function () {
+            Renderer.renderScore();
+            this.mainWindow = new UI.View(0, 0, Application.getCanvasWidth(), Application.getCanvasHeight());
+            this.mainWindow.drawView(Application.getCanvasCtx());
+
+            var canvasWidth = Application.getCanvasWidth();
+            var canvasHeight = Application.getCanvasHeight();
+            var resultLabelX = canvasWidth / 2;
+            var resultLabelY = canvasHeight * 0.2;
+            // TODO: link score and post owner username
+            var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.8, 80, "You have earned "+ score.toString() +" points for Ryne!");
+            resultLabel.font_size = "2";
+
+            var sharingLabelX = canvasWidth / 2;
+            var sharingLabelY = canvasHeight / 2;
+            var sharingLabel = new UI.Label(sharingLabelX, sharingLabelY, canvasWidth * 0.8, 100, "Win your own iPad?");
+            sharingLabel.font_size = "3";
+
+            var shareButtonWidth = canvasWidth * 0.8;
+            var shareButtonHeight = shareButtonWidth / 4;
+            var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
+            var shareButtonY = canvasHeight * 0.8 - shareButtonHeight / 2;
+            var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
+            shareButton.label.text = "YES! Share to FB!";
+            shareButton.label.text_color = "white";
+            shareButton.label.font_size = "2";
+            shareButton.background_color = "#3b5998";
+
+            if (Utility.isMobile.any()) {
+                resultLabel.font_size *= Application.getMobileScale();
+                sharingLabel.font_size *= Application.getMobileScale();
+                shareButton.label.font_size *= Application.getMobileScale();
+            }
+
+            this.mainWindow.addSubview(resultLabel);
+            this.mainWindow.addSubview(sharingLabel);
+            this.mainWindow.addSubview(shareButton);
+        }
+    };
+
+    return {
+        init: function () {
+            return _Result.init();
+        }
+    };
 })();
 
 var Game = (function () {
@@ -930,10 +1001,11 @@ var Game = (function () {
 
             if (GameObjects.getCurrentKick() === 3) {
                 Renderer.renderGameOver();
+                ResultScene.init();
+            } else {
+                Renderer.renderBall();
+                Renderer.renderScore();
             }
-
-            Renderer.renderBall();
-            Renderer.renderScore();
 
             // keeper catch the ball.
             if (GameObjects.getBallCurrentX() > GameObjects.getKeeperX() - 20 && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getKeeperX() + GameObjects.getKeeperWidth() + 20
