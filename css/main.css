@@ -21,7 +21,31 @@ canvas {
 #content {
     padding-top: 50px;
     padding-bottom: 50px;
-    font-size: 60px;
+    font-size: 3em;
     font-family: 'Helvetica Neue';
     text-align: center;
+}
+
+#banner {
+    background-color: black;
+    width: 760px;
+    height: 100px;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#bannerText {
+    font-family: 'Helvetica Neue';
+    height: 100%;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+#smallLogo {
+    display: inline-block;
 }

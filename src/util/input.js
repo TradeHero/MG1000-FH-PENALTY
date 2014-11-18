@@ -56,6 +56,9 @@ var Input = (function () {
         },
         drag: function (startX, startY, endX, endY, duration) {
             _drag(startX, startY, endX, endY, duration)
+        },
+        resetRegisterControls: function () {
+            _registeredControls = [];
         }
     }
 })();

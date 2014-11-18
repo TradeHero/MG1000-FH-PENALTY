@@ -2,12 +2,13 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <meta name="apple-itunes-app" content="app-id=859894802"/>
+    <!--<meta name="apple-itunes-app" content="app-id=859894802"/>-->
     <title></title>
     <link href="css/reset.css" rel="stylesheet"/>
     <link href="css/main.css" rel="stylesheet"/>
     <script type="application/javascript"
             src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!--<script type="application/javascript" src="dist/mg2-html-v0.0.1.min.js"></script>-->
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>-->
     <script type="application/javascript" src="src/lib/thcanvas-v0.1.0.min.js"></script>
     <script type="application/javascript" src="src/main.js"></script>
@@ -17,23 +18,21 @@
     <script type="application/javascript" src="src/ui/control.js"></script>
 </head>
 <body>
-    <img src="assets/fh-logo.svg" id="logo" style="width: 800px "/>
-    <p id="content">Earn more points for Ryne Cheow!</p>
-
+    <p id="content">Help Ryne to win an iPhone 6</p>
     <script>
         function statusChangeCallback(response) {
-            var uri = encodeURI('http://192.168.1.82:8000');
+            var uri = encodeURI('http://192.168.0.18:8000');
 
             if (response.status === 'connected') {
                 // redirect user to mini game.
-                window.location.href = uri + "&access_token=" + response["authResponse"]["accessToken"]
+//                window.location.href = uri + "&access_token=" + response["authResponse"]["accessToken"]
             } else if (response.status === 'not_authorized') {
                 // The person is logged into Facebook, but not your app.
-                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,user_birthday,publish_actions&response_type=token");
+                window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
             } else {
                 // The person is not logged into Facebook, so we're not sure if
                 // they are logged into this app or not.
-                window.location = encodeURI("https://www.facebook.com/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,user_birthday,publish_actions&response_type=token");
+                window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
             }
         }
 
@@ -48,7 +47,7 @@
                 appId: '772954419408981',
                 cookie: true,
                 xfbml: true,
-                version: 'v1.1'
+                version: 'v2.2'
             });
 
             FB.getLoginStatus(function (response) {

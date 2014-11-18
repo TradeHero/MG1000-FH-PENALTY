@@ -22,14 +22,16 @@ window.requestAnimFrame = (function () {
 })();
 
 Assets.initialise({
-    full_background: "assets/full_background.png",
-    background: "assets/img-bkg.png",
-    goal_post: "assets/img-goalpost.png",
-    goalkeeper: "assets/img-goalkeeper.png",
-    ball: "assets/img-ball.png"
+    full_background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png",
+    background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png",
+    goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
+    goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
+    ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
+    fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png"
 }, function () {
     //completion callback
     StartScene.init();
+    Banner.setUpContent(document.getElementById("banner"))
 });
 
 function inherit(proto) {
@@ -48,16 +50,16 @@ var Application = (function () {
         width: undefined,
         height: undefined,
         scale: undefined,
-        mobileScale: undefined,
+        mobileScale: 1.7,
         canvas: undefined,
         ctx: undefined,
+        isGameStart: false,
+
         init: function () {
             this.width = window.innerWidth;
 
             if (!Utility.isMobile.any()) {
-                this.width = window.innerWidth * 0.6;
-            } else {
-                this.mobileScale = 1.7;
+                this.width = 760;
             }
 
             this.height = this.width / this.ratio;
@@ -85,9 +87,12 @@ var Application = (function () {
                 e.preventDefault();
                 // first touch from the event
                 Input.trigger(e.touches[0]);
-                startTouchX = e.touches[0].pageX;
-                startTouchY = e.touches[0].pageY;
-                startTime = Date.now();
+
+                if (Application.getIsGameStart()) {
+                    startTouchX = e.touches[0].pageX;
+                    startTouchY = e.touches[0].pageY;
+                    startTime = Date.now();
+                }
             }, false);
             window.addEventListener('touchmove', function (e) {
                 // disable zoom and scroll
@@ -97,8 +102,10 @@ var Application = (function () {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.changedTouches[0].pageX || startTouchY !== e.changedTouches[0].pageY) {
-                    var duration = Date.now() - startTime;
-                    Input.drag(startTouchX, startTouchY, e.changedTouches[0].pageX, e.changedTouches[0].pageY, duration);
+                    if (Application.getIsGameStart()) {
+                        var duration = Date.now() - startTime;
+                        Input.drag(startTouchX, startTouchY, e.changedTouches[0].pageX, e.changedTouches[0].pageY, duration);
+                    }
                 }
 
             }, false);
@@ -107,17 +114,22 @@ var Application = (function () {
                 e.preventDefault();
                 // first touch from the event
                 //INPUT.trigger(e.touches[0]);
-                startTouchX = e.pageX;
-                startTouchY = e.pageY;
-                startTime = Date.now();
+
+                if (Application.getIsGameStart()) {
+                    startTouchX = e.pageX;
+                    startTouchY = e.pageY;
+                    startTime = Date.now();
+                }
             }, false);
 
             window.addEventListener('mouseup', function (e) {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
-                    var duration = Date.now() - startTime;
-                    Input.drag(startTouchX, startTouchY, e.pageX, e.pageY, duration);
+                    if (Application.getIsGameStart()) {
+                        var duration = Date.now() - startTime;
+                        Input.drag(startTouchX, startTouchY, e.pageX, e.pageY, duration);
+                    }
                 }
 
             }, false);
@@ -149,6 +161,14 @@ var Application = (function () {
 
         getMobileScale: function () {
             return this.mobileScale;
+        },
+
+        getIsGameStart: function () {
+            return this.isGameStart;
+        },
+
+        setIsGameStart: function (isGameStart) {
+            this.isGameStart = isGameStart;
         }
     };
 
@@ -173,16 +193,25 @@ var Application = (function () {
         },
         getMobileScale: function () {
             return _Application.getMobileScale();
+        },
+        getIsGameStart: function () {
+            return _Application.getIsGameStart();
+        },
+        setIsGameStart: function (isGameStart) {
+            return _Application.setIsGameStart(isGameStart);
         }
     };
 })();
 
 var ScoreCanvas = (function () {
     var width = window.innerWidth;
-    var height = 200;
+    var height = 118;
+    var mobileScale = 1.7;
 
     if (!Utility.isMobile.any()) {
-        width = window.innerWidth * 0.6;
+        width = 760;
+    } else {
+        height *= mobileScale;
     }
 
     var _ScoreCanvas = {
@@ -303,7 +332,7 @@ var Renderer = (function () {
         renderGoal: function () {
             var goalText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "GOAL!!");
             goalText.font_size = "5";
-            goalText.text_color = "red";
+            goalText.text_color = "green";
             this.mainWindow.addSubview(goalText);
         },
 
@@ -324,16 +353,28 @@ var Renderer = (function () {
         renderScore: function () {
             var mainWindow = new UI.View(0, 0, ScoreCanvas.getCanvasWidth(), ScoreCanvas.getCanvasHeight());
             mainWindow.background_color = "black";
-            var scoreLabel = new UI.Label(200, ScoreCanvas.getCanvasHeight() / 2, 200, 30, "Scores");
+            var scoreLabel = new UI.Label(ScoreCanvas.getCanvasWidth() * 0.1, ScoreCanvas.getCanvasHeight() / 2, 200, 30, "Scores");
+            scoreLabel.text_allign = "left";
             scoreLabel.text_color = "white";
             scoreLabel.font_size = 4;
-            mainWindow.drawView(ScoreCanvas.getCanvasCtx());
-            scoreLabel.drawView(ScoreCanvas.getCanvasCtx());
 
             var scores = GameObjects.getScores();
             var ballImage = Assets.images().ball;
-            var startX = 400;
-            var mark = new UI.ImageView(startX, ScoreCanvas.getCanvasHeight() / 2 - ballImage.height, ballImage.width * 2, ballImage.height * 2, ballImage);
+            var ballImageWidth = ballImage.width * 2;
+            var ballImageHeight = ballImage.height * 2;
+            var startX = scoreLabel.x + scoreLabel.width * 1.5;
+
+            if (!Utility.isMobile.any()) {
+                ballImageWidth /= Application.getMobileScale();
+                ballImageHeight /= Application.getMobileScale();
+                scoreLabel.font_size /= Application.getMobileScale();
+                startX = scoreLabel.x + scoreLabel.width;
+            }
+
+            var mark = new UI.ImageView(startX, ScoreCanvas.getCanvasHeight() / 2 - ballImageHeight / 2, ballImageWidth, ballImageHeight, ballImage);
+
+            mainWindow.drawView(ScoreCanvas.getCanvasCtx());
+            scoreLabel.drawView(ScoreCanvas.getCanvasCtx());
 
             for (var i in scores) {
                 if (scores.hasOwnProperty(i)) {
@@ -344,7 +385,7 @@ var Renderer = (function () {
                     }
 
                     mark.drawView(ScoreCanvas.getCanvasCtx());
-                    mark.x += ballImage.width * 2 + 50;
+                    mark.x += ballImageWidth + 50;
 
                 }
             }
@@ -877,6 +918,8 @@ var StartScene = (function () {
             startButton.label.text = "Start";
             startButton.label.font_size = "4";
             startButton.addTarget(function () {
+                Application.setIsGameStart(true);
+                Input.resetRegisterControls();
                 Game.loop();
             }, "touch");
 
@@ -905,7 +948,7 @@ var ResultScene = (function (){
             var canvasHeight = Application.getCanvasHeight();
             var resultLabelX = canvasWidth / 2;
             var resultLabelY = canvasHeight * 0.2;
-            // TODO: link score and post owner username
+            // TODO: post owner username
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
             var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.8, 80, "You have earned "+ score.toString() +" points for Ryne!");
             resultLabel.font_size = "2";
@@ -1072,6 +1115,59 @@ var Game = (function () {
     }
 })();
 
+var Banner = (function () {
+    var _Banner = {
+        init: function () {
+            var banner = document.createElement("div");
+            banner.id = "banner";
+            banner.style.width = "760px";
+            banner.style.height = "100px";
+            banner.style.backgroundColor = "black";
+
+            document.body.appendChild(banner);
+        },
+
+        setUpContent: function (banner) {
+            var logo = Assets.images().fhLogo;
+            logo.id = "smallLogo";
+            logo.style.marginTop = "10px";
+            logo.style.marginLeft= "10px";
+            logo.style.marginRight = "10px";
+            var text = document.createElement("p");
+            text.id = "bannerText";
+            text.innerHTML = "brought to you by FootballHero";
+            text.style.fontSize = "1.5em";
+            text.style.width = "400px";
+
+            if (Utility.isMobile.any()) {
+                banner.style.width = window.innerHeight + "px";
+                banner.style.height = "180px";
+                logo.width *= 1.7;
+                logo.height *= 1.7;
+                logo.style.marginTop = "17px";
+                logo.style.marginLeft= "17px";
+                logo.style.marginRight = "17px";
+                text.style.fontSize = "2.5em";
+                text.style.width = "600px";
+            }
+
+            banner.appendChild(logo);
+            banner.appendChild(text);
+        }
+    };
+
+    return {
+        init: function () {
+            return _Banner.init();
+        },
+
+        setUpContent: function (banner) {
+            return _Banner.setUpContent(banner)
+        }
+    };
+})();
+
 window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', Application.init, false);
+window.addEventListener('load', Banner.init, false);
 
