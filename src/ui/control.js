@@ -43,7 +43,7 @@
 
     UI.Control.prototype.addTarget = function (callback, forEvent) {
         this.targets[forEvent] = callback;
-        Input.registeredControls.push(this);
+        Input.getRegistedControls().push(this);
     };
 
     UI.Control.prototype.allTargets = function () {

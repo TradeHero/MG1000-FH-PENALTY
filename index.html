@@ -4,28 +4,18 @@
     <meta charset="UTF-8">
     <!--<meta name="apple-itunes-app" content="app-id=859894802"/>-->
     <title></title>
-    <link href="css/reset.css" rel="stylesheet"/>
-    <link href="css/main.css" rel="stylesheet"/>
-    <script type="application/javascript"
-            src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <!--<script type="application/javascript" src="dist/mg2-html-v0.0.1.min.js"></script>-->
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>-->
-    <script type="application/javascript" src="src/lib/thcanvas-v0.1.0.min.js"></script>
-    <script type="application/javascript" src="src/main.js"></script>
-    <script type="application/javascript" src="src/util/input.js"></script>
-    <script type="application/javascript" src="src/ui/base.js"></script>
-    <script type="application/javascript" src="src/ui/view.js"></script>
-    <script type="application/javascript" src="src/ui/control.js"></script>
 </head>
 <body>
-    <p id="content">Help Ryne to win an iPhone 6</p>
+
     <script>
         function statusChangeCallback(response) {
-            var uri = encodeURI('http://192.168.0.18:8000');
+            var uri = encodeURI('http://192.168.1.85:8000/game.html');
 
             if (response.status === 'connected') {
                 // redirect user to mini game.
-//                window.location.href = uri + "&access_token=" + response["authResponse"]["accessToken"]
+                window.location.href = uri + "?access_token=" + response["authResponse"]["accessToken"]
             } else if (response.status === 'not_authorized') {
                 // The person is logged into Facebook, but not your app.
                 window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");

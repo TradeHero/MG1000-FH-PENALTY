@@ -9,7 +9,8 @@ module.exports = function (grunt) {
         'src/util/input.js',
         'src/ui/base.js',
         'src/ui/view.js',
-        'src/ui/control.js'
+        'src/ui/control.js',
+        'src/util/atomic.js'
     ];
     unitTestFiles = [];
     // Project configuration.

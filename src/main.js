@@ -967,6 +967,15 @@ var ResultScene = (function (){
             shareButton.label.text_color = "white";
             shareButton.label.font_size = "2";
             shareButton.background_color = "#3b5998";
+            shareButton.addTarget(function () {
+                atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+            }, "touch");
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
@@ -1000,9 +1009,11 @@ var Game = (function () {
         loop: function () {
             var self = this;
 
-            window.requestAnimFrame(function () {
-                self.loop();
-            });
+            if (GameObjects.getCurrentKick() < 3) {
+                window.requestAnimFrame(function () {
+                    self.loop();
+                });
+            }
 
             //fps.update();
             this.currentTime = Date.now();
@@ -1166,6 +1177,10 @@ var Banner = (function () {
         }
     };
 })();
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+}
 
 window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', Application.init, false);

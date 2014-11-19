@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="css/reset.css" rel="stylesheet"/>
+    <link href="css/main.css" rel="stylesheet"/>
+    <script type="application/javascript"
+            src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type="application/javascript" src="src/lib/thcanvas-v0.1.0.min.js"></script>
+    <script type="application/javascript" src="src/main.js"></script>
+    <script type="application/javascript" src="src/util/input.js"></script>
+    <script type="application/javascript" src="src/ui/base.js"></script>
+    <script type="application/javascript" src="src/ui/view.js"></script>
+    <script type="application/javascript" src="src/ui/control.js"></script>
+    <script type="application/javascript" src="src/util/atomic.js"></script>
+</head>
+<body>
+    <script>
+        // if #access_token exist, replace with & to let server recognise as URL parameter
+        if (window.location.hash && window.location.hash.substring(1) !== null) {
+            window.location = window.location.href.split("#")[0] + '' + window.location.hash.substring(1);
+        }
+    </script>
+    <p id="content">Help Ryne to win an iPhone 6</p>
+
+</body>
+</html>
