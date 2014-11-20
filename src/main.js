@@ -11,14 +11,14 @@
 // shim layer with setTimeout fallback
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
 
-    function (callback) {
-        window.setTimeout(callback, 1000 / 60);
-    };
+        function (callback) {
+            window.setTimeout(callback, 1000 / 60);
+        };
 })();
 
 Assets.initialise({
@@ -28,7 +28,8 @@ Assets.initialise({
     goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
     ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
     fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
-    uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png"
+    uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png",
+    availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png"
 }, function () {
     //completion callback
     StartScene.init();
@@ -399,7 +400,7 @@ var Renderer = (function () {
             }
         },
 
-        renderKickLabel : function () {
+        renderKickLabel: function () {
             var kickText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "KICK " + (GameObjects.getCurrentKick() + 1).toString());
             kickText.alpha = Game.getKickLabelAlpa();
             kickText.font_size = "5";
@@ -973,7 +974,7 @@ var StartScene = (function () {
     }
 })();
 
-var ResultScene = (function (){
+var ResultScene = (function () {
     var _Result = {
         init: function () {
             Renderer.renderScore();
@@ -986,7 +987,7 @@ var ResultScene = (function (){
             var resultLabelY = canvasHeight * 0.2;
             // TODO: post owner username
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
-            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.8, 80, "You have earned "+ score.toString() +" points for Ryne!");
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.8, 80, "You have earned " + score.toString() + " points for Ryne!");
             resultLabel.font_size = "2";
 
             var sharingLabelX = canvasWidth / 2;
@@ -1005,7 +1006,7 @@ var ResultScene = (function (){
             shareButton.background_color = "#3b5998";
             shareButton.addTarget(function (sender) {
                 sender.enabled = false;
-                atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         sender.enabled = false;
                         sender.label.text = "Your post hass shared to FB.";
@@ -1022,7 +1023,7 @@ var ResultScene = (function (){
                 shareButton.label.font_size *= Application.getMobileScale();
             }
 
-            atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/RecordEggPoints?access_token='+getURLParameter("access_token")+'&eggId='+getURLParameter("eggId")+'&points='+score.toString())
+            atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
@@ -1076,7 +1077,8 @@ var Game = (function () {
             this.kickLabelTimer += this.delta;
             UI.View.animate(1.5, 1, this.kickLabelTimer, function () {
                 Game.setKickLabelAlpha(Game.getKickLabelAlpa() + Game.getDelta() / 1.5);
-            }, function () {});
+            }, function () {
+            });
 
             if (GameObjects.getKeeperX() === undefined) {
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
@@ -1217,11 +1219,11 @@ var Banner = (function () {
             var logo = Assets.images().fhLogo;
             logo.id = "smallLogo";
             logo.style.marginTop = "10px";
-            logo.style.marginLeft= "10px";
+            logo.style.marginLeft = "10px";
             logo.style.marginRight = "10px";
             var text = document.createElement("p");
             text.id = "bannerText";
-            text.innerHTML = "brought to you by FootballHero";
+            text.innerHTML = "brought to you by";
             text.style.fontSize = "1.5em";
             text.style.width = "400px";
 
@@ -1231,7 +1233,7 @@ var Banner = (function () {
                 logo.width *= 1.7;
                 logo.height *= 1.7;
                 logo.style.marginTop = "17px";
-                logo.style.marginLeft= "17px";
+                logo.style.marginLeft = "17px";
                 logo.style.marginRight = "17px";
                 text.style.fontSize = "2.5em";
                 text.style.width = "600px";
@@ -1319,9 +1321,9 @@ var shareSection = (function () {
             document.body.appendChild(popUp);
             this.shareBanner.appendChild(tickButton);
 
-            jQuery(document).ready(function($){
+            jQuery(document).ready(function ($) {
                 //open popup
-                $('.cd-popup-trigger').on('click', function(event){
+                $('.cd-popup-trigger').on('click', function (event) {
                     event.preventDefault();
                     if (shareSection.getIsChecked()) {
                         $('.cd-popup').addClass('is-visible');
@@ -1333,7 +1335,7 @@ var shareSection = (function () {
                     }
                 });
 
-                $('.cd-popup-trigger').on('touchstart', function(event){
+                $('.cd-popup-trigger').on('touchstart', function (event) {
                     event.preventDefault();
                     if (shareSection.getIsChecked()) {
                         $('.cd-popup').addClass('is-visible');
@@ -1346,16 +1348,16 @@ var shareSection = (function () {
                 });
 
                 //close popup
-                $('.cd-popup').on('click', function(event){
-                    if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
+                $('.cd-popup').on('click', function (event) {
+                    if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
                         setTimeout(StartScene.getStartButton().enabled = true ,1000);
                     }
                 });
 
-                $('.cd-popup').on('touchstart', function(event){
-                    if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
+                $('.cd-popup').on('touchstart', function (event) {
+                    if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
                         setTimeout(StartScene.getStartButton().enabled = true ,1000);
@@ -1392,8 +1394,8 @@ var shareSection = (function () {
 
 
                 //close popup when clicking the esc keyboard button
-                $(document).keyup(function(event){
-                    if(event.which=='27'){
+                $(document).keyup(function (event) {
+                    if (event.which == '27') {
                         $('.cd-popup').removeClass('is-visible');
                         StartScene.getStartButton().enabled = true;
                     }
@@ -1430,7 +1432,7 @@ var shareSection = (function () {
 })();
 
 function getURLParameter(name) {
-    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
 }
 
 window.addEventListener('load', ScoreCanvas.init, false);
