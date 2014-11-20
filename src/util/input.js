@@ -21,7 +21,6 @@ var Input = (function () {
     var _trigger = function (data) {
         this.x = (data.pageX - Application.getCanvas().offsetLeft);
         this.y = (data.pageY - Application.getCanvas().offsetTop);
-        console.log(_registeredControls);
         var control = _intersect(this.x, this.y);
 
         if (control !== undefined && control.enabled) {

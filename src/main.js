@@ -27,7 +27,8 @@ Assets.initialise({
     goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
     goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
     ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
-    fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png"
+    fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
+    uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png"
 }, function () {
     //completion callback
     StartScene.init();
@@ -323,6 +324,12 @@ var Renderer = (function () {
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
             }
 
+            if (GameObjects.getCurrentKick() === 0) {
+                var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(), 500, 80, "Swipe the ball to shoot!");
+                tutorialLabel.text_color = "white";
+                this.mainWindow.addSubview(tutorialLabel);
+            }
+
             var ball = new UI.Button(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight());
             ball.image = ballImage;
             ball.label.text = "";
@@ -389,6 +396,14 @@ var Renderer = (function () {
 
                 }
             }
+        },
+
+        renderKickLabel : function () {
+            var kickText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "KICK " + (GameObjects.getCurrentKick() + 1).toString());
+            kickText.alpha = Game.getKickLabelAlpa();
+            kickText.font_size = "5";
+            kickText.text_color = "White";
+            this.mainWindow.addSubview(kickText);
         }
     };
 
@@ -414,6 +429,9 @@ var Renderer = (function () {
         },
         renderScore: function () {
             return _Renderer.renderScore();
+        },
+        renderKickLabel: function () {
+            return _Renderer.renderKickLabel();
         }
     }
 })();
@@ -955,7 +973,7 @@ var ResultScene = (function (){
 
             var sharingLabelX = canvasWidth / 2;
             var sharingLabelY = canvasHeight / 2;
-            var sharingLabel = new UI.Label(sharingLabelX, sharingLabelY, canvasWidth * 0.8, 100, "Win your own iPad?");
+            var sharingLabel = new UI.Label(sharingLabelX, sharingLabelY, canvasWidth * 0.8, 100, "Win your own iPhone 6?");
             sharingLabel.font_size = "3";
 
             var shareButtonWidth = canvasWidth * 0.8;
@@ -967,10 +985,13 @@ var ResultScene = (function (){
             shareButton.label.text_color = "white";
             shareButton.label.font_size = "2";
             shareButton.background_color = "#3b5998";
-            shareButton.addTarget(function () {
+            shareButton.addTarget(function (sender) {
+                sender.enabled = false;
                 atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
                     .success(function (data, xhr) {
-                        console.log("success");
+                        sender.enabled = false;
+                        sender.label.text = "Your post hass shared to FB.";
+                        sender.drawView(Application.getCanvasCtx());
                     })
                     .error(function (data, xhr) {
                         console.log("error?");
@@ -982,6 +1003,12 @@ var ResultScene = (function (){
                 sharingLabel.font_size *= Application.getMobileScale();
                 shareButton.label.font_size *= Application.getMobileScale();
             }
+
+            atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/RecordEggPoints?access_token='+getURLParameter("access_token")+'&eggId='+getURLParameter("eggId")+'&points='+score.toString())
+                .success(function (data, xhr) {
+                })
+                .error(function (data, xhr) {
+                });
 
             this.mainWindow.addSubview(resultLabel);
             this.mainWindow.addSubview(sharingLabel);
@@ -1004,6 +1031,8 @@ var Game = (function () {
         lastTime: 0,
         keeperDirection: 1,
         resultTimer: 0,
+        kickLabelTimer: 0,
+        kickLabelAlpha: 0,
         showingResult: false,
 
         loop: function () {
@@ -1023,6 +1052,14 @@ var Game = (function () {
                 this.delta = 0;
             }
 
+            Renderer.render();
+            //Renderer.renderKickLabel();
+
+            this.kickLabelTimer += this.delta;
+            UI.View.animate(1.5, 1, this.kickLabelTimer, function () {
+                Game.setKickLabelAlpha(Game.getKickLabelAlpa() + Game.getDelta() / 1.5);
+            }, function () {});
+
             if (GameObjects.getKeeperX() === undefined) {
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
             }
@@ -1037,7 +1074,6 @@ var Game = (function () {
                 GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
             }
 
-            Renderer.render();
             Renderer.renderGoalPostAndKeeper();
 
             if (GameObjects.getDragEndX() !== undefined) {
@@ -1116,12 +1152,33 @@ var Game = (function () {
                 this.resultTimer = 0;
                 this.newShot();
             }
+        },
+
+        getKickLabelAlpha: function () {
+            return this.kickLabelAlpha;
+        },
+
+        setKickLabelAlpha: function (x) {
+            this.kickLabelAlpha = x;
+        },
+
+        getDelta: function () {
+            return this.delta;
         }
     };
 
     return {
         loop: function () {
             return _Game.loop();
+        },
+        getKickLabelAlpa: function () {
+            return _Game.getKickLabelAlpha();
+        },
+        setKickLabelAlpha: function (x) {
+            return _Game.setKickLabelAlpha(x);
+        },
+        getDelta: function () {
+            return _Game.getDelta();
         }
     }
 })();
@@ -1151,7 +1208,7 @@ var Banner = (function () {
             text.style.width = "400px";
 
             if (Utility.isMobile.any()) {
-                banner.style.width = window.innerHeight + "px";
+                banner.style.width = window.innerWidth + "px";
                 banner.style.height = "180px";
                 logo.width *= 1.7;
                 logo.height *= 1.7;
@@ -1178,11 +1235,117 @@ var Banner = (function () {
     };
 })();
 
+var shareSection = (function () {
+    var _shareSection = {
+        init: function () {
+            var shareBanner = document.createElement("div");
+            shareBanner.id = "shareBanner";
+            shareBanner.style.width = "760px";
+            shareBanner.style.height = "130px";
+            shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
+            shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+            shareBanner.style.backgroundSize = "760px 130px";
+            shareBanner.style.marginBottom = "20px";
+
+            var tickButton = document.createElement("button");
+            tickButton.id = "tickButton";
+            tickButton.style.width = "60px";
+            tickButton.style.height = "60px";
+            tickButton.style.marginTop = "38px";
+            tickButton.style.marginLeft = "32px";
+            //tickButton.setAttribute('href', '#0');
+            tickButton.className = "cd-popup-trigger";
+            tickButton.style.backgroundColor = "rgba(0,0,0,0)";
+            tickButton.style.border = "0";
+
+            var popUp = document.createElement("div");
+            popUp.className = "cd-popup";
+            popUp.setAttribute("role", "alert");
+            var popCon = document.createElement("div");
+            popCon.className = "cd-popup-container";
+            var msg = document.createElement("p");
+            msg.innerHTML = "Are you sure you don't want to win an iPhone 6?!";
+            var ul = document.createElement("ul");
+            ul.className = "cd-buttons";
+            var yesButton = document.createElement("li");
+            var noButton = document.createElement("li");
+            var yesContent = document.createElement("a");
+            var noContent = document.createElement("a");
+            yesContent.setAttribute('href', '#0');
+            yesContent.innerHTML = "Yes";
+            noContent.setAttribute('href', '#0');
+            noContent.innerHTML = "No";
+
+            yesButton.appendChild(yesContent);
+            noButton.appendChild(noContent);
+            ul.appendChild(yesButton);
+            ul.appendChild(noButton);
+            popCon.appendChild(msg);
+            popCon.appendChild(ul);
+            popUp.appendChild(popCon);
+
+            if (Utility.isMobile.any()) {
+                shareBanner.style.width = window.innerWidth * 0.9 + "px";
+                shareBanner.style.height = "170px";
+                shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
+                tickButton.style.marginTop = "65px";
+                tickButton.style.marginLeft = "55px";
+            }
+
+            document.body.appendChild(shareBanner);
+            document.body.appendChild(popUp);
+            shareBanner.appendChild(tickButton);
+
+            jQuery(document).ready(function($){
+                //open popup
+                $('.cd-popup-trigger').on('click', function(event){
+                    event.preventDefault();
+                    $('.cd-popup').addClass('is-visible');
+                });
+
+                $('.cd-popup-trigger').on('touchstart', function(event){
+                    event.preventDefault();
+                    $('.cd-popup').addClass('is-visible');
+                });
+
+                //close popup
+                $('.cd-popup').on('click', function(event){
+                    if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
+                        event.preventDefault();
+                        $(this).removeClass('is-visible');
+                    }
+                });
+
+                $('.cd-popup').on('touchstart', function(event){
+                    if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
+                        event.preventDefault();
+                        $(this).removeClass('is-visible');
+                    }
+                });
+
+                //close popup when clicking the esc keyboard button
+                $(document).keyup(function(event){
+                    if(event.which=='27'){
+                        $('.cd-popup').removeClass('is-visible');
+                    }
+                });
+            });
+
+        }
+    };
+
+    return {
+        init: function () {
+            return _shareSection.init();
+        }
+    }
+})();
+
 function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
+window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', Application.init, false);
 window.addEventListener('load', Banner.init, false);
-
