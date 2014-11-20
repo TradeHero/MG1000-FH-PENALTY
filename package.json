@@ -1,21 +1,21 @@
 {
-    "name": "MG2-FH-PENALTY",
-    "version": "0.0.1",
-    "devDependencies": {
-        "grunt": "0.x.x",
-        "grunt-contrib-jshint": "0.x.x",
-        "grunt-contrib-nodeunit": "0.x.x",
-        "grunt-contrib-uglify": "0.x.x",
-        "grunt-contrib-concat": "0.x.x",
-        "grunt-replace": "0.x.x",
-        "grunt-contrib-clean": "0.x.x",
-        "grunt-strip": "*"
-    },
-    "readmeFilename": "README.md",
-    "main": "Gruntfile.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/TradeHero/MG2-FH-PENALTY.git"
-    },
-    "author": "TradeHero"
+"name": "MG2-FH-PENALTY",
+"version": "0.0.1",
+"devDependencies": {
+"grunt": "0.x.x",
+"grunt-contrib-jshint": "0.x.x",
+"grunt-contrib-nodeunit": "0.x.x",
+"grunt-contrib-uglify": "0.x.x",
+"grunt-contrib-concat": "0.x.x",
+"grunt-replace": "0.x.x",
+"grunt-contrib-clean": "0.x.x",
+"grunt-strip": "*"
+},
+"readmeFilename": "README.md",
+"main": "Gruntfile.js",
+"repository": {
+"type": "git",
+"url": "https://github.com/TradeHero/MG2-FH-PENALTY.git"
+},
+"author": "TradeHero"
 }
