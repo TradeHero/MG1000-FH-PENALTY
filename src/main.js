@@ -68,6 +68,7 @@ var Application = (function () {
             this.canvas = document.createElement("canvas");
             this.canvas.width = this.width;
             this.canvas.height = this.height;
+            this.canvas.id = "mainCanvas";
             this.ctx = this.canvas.getContext("2d");
 
             var body = document.body;
@@ -917,6 +918,7 @@ var GameObjects = (function () {
 var StartScene = (function () {
     var _Start = {
         mainWindow: undefined,
+        startButton: undefined,
 
         init: function () {
             Renderer.renderScore();
@@ -930,27 +932,43 @@ var StartScene = (function () {
             var startButtonWidth = Application.getCanvasWidth() * 0.6;
             var startButtonHeight = startButtonWidth / 4;
             var startButtonX = Application.getCanvasWidth() / 2 - startButtonWidth / 2;
-            var startButtonY = Application.getCanvasHeight() * 0.6;
-            var startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
-            startButton.cornerRadius = 35;
-            startButton.label.text = "Start";
-            startButton.label.font_size = "4";
-            startButton.addTarget(function () {
+            var startButtonY = Application.getCanvasHeight() * 0.4;
+            this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
+            this.startButton.cornerRadius = 35;
+            this.startButton.label.text = "Start";
+            this.startButton.label.font_size = "4";
+            this.startButton.addTarget(function () {
+                document.body.removeChild(shareSection.getShareBanner());
+
+                if (shareSection.getIsChecked()) {
+                    atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                        .success(function (data, xhr) {
+                            console.log("success");
+                        })
+                        .error(function (data, xhr) {
+                            console.log("error?");
+                        });
+                }
+
                 Application.setIsGameStart(true);
                 Input.resetRegisterControls();
                 Game.loop();
             }, "touch");
 
             this.mainWindow.addSubview(backgroundImageView);
-            this.mainWindow.addSubview(startButton);
+            this.mainWindow.addSubview(this.startButton);
+        },
+        getStartButton: function () {
+            return this.startButton;
         }
     };
 
     return {
-        mainWindow: undefined,
-
         init: function () {
             return _Start.init();
+        },
+        getStartButton: function () {
+            return _Start.getStartButton();
         }
     }
 })();
@@ -1237,15 +1255,18 @@ var Banner = (function () {
 
 var shareSection = (function () {
     var _shareSection = {
+        shareBanner: undefined,
+        isChecked: true,
+
         init: function () {
-            var shareBanner = document.createElement("div");
-            shareBanner.id = "shareBanner";
-            shareBanner.style.width = "760px";
-            shareBanner.style.height = "130px";
-            shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
-            shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-            shareBanner.style.backgroundSize = "760px 130px";
-            shareBanner.style.marginBottom = "20px";
+            this.shareBanner = document.createElement("div");
+            this.shareBanner.id = "shareBanner";
+            this.shareBanner.style.width = (760 * 0.9) + "px";
+            this.shareBanner.style.height = "130px";
+            this.shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
+            this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+            this.shareBanner.style.backgroundSize = (760 * 0.9) +"px 130px";
+            this.shareBanner.style.marginTop = "30%";
 
             var tickButton = document.createElement("button");
             tickButton.id = "tickButton";
@@ -1261,6 +1282,7 @@ var shareSection = (function () {
             var popUp = document.createElement("div");
             popUp.className = "cd-popup";
             popUp.setAttribute("role", "alert");
+            popUp.style.zIndex = "5";
             var popCon = document.createElement("div");
             popCon.className = "cd-popup-container";
             var msg = document.createElement("p");
@@ -1278,34 +1300,49 @@ var shareSection = (function () {
 
             yesButton.appendChild(yesContent);
             noButton.appendChild(noContent);
-            ul.appendChild(yesButton);
             ul.appendChild(noButton);
+            ul.appendChild(yesButton);
             popCon.appendChild(msg);
             popCon.appendChild(ul);
             popUp.appendChild(popCon);
 
             if (Utility.isMobile.any()) {
-                shareBanner.style.width = window.innerWidth * 0.9 + "px";
-                shareBanner.style.height = "170px";
-                shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
+                this.shareBanner.style.width = window.innerWidth * 0.9 + "px";
+                this.shareBanner.style.height = "170px";
+                this.shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
+                this.shareBanner.style.marginTop = "52%";
                 tickButton.style.marginTop = "65px";
                 tickButton.style.marginLeft = "55px";
             }
 
-            document.body.appendChild(shareBanner);
+            document.body.appendChild(this.shareBanner);
             document.body.appendChild(popUp);
-            shareBanner.appendChild(tickButton);
+            this.shareBanner.appendChild(tickButton);
 
             jQuery(document).ready(function($){
                 //open popup
                 $('.cd-popup-trigger').on('click', function(event){
                     event.preventDefault();
-                    $('.cd-popup').addClass('is-visible');
+                    if (shareSection.getIsChecked()) {
+                        $('.cd-popup').addClass('is-visible');
+                        StartScene.getStartButton().enabled = false;
+                        console.log(StartScene.getStartButton());
+                    } else {
+                        shareSection.setIsChecked(true);
+                        this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                    }
                 });
 
                 $('.cd-popup-trigger').on('touchstart', function(event){
                     event.preventDefault();
-                    $('.cd-popup').addClass('is-visible');
+                    if (shareSection.getIsChecked()) {
+                        $('.cd-popup').addClass('is-visible');
+                        StartScene.getStartButton().enabled = false;
+                        console.log(StartScene.getStartButton());
+                    } else {
+                        shareSection.setIsChecked(true);
+                        this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                    }
                 });
 
                 //close popup
@@ -1313,6 +1350,7 @@ var shareSection = (function () {
                     if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
+                        setTimeout(StartScene.getStartButton().enabled = true ,1000);
                     }
                 });
 
@@ -1320,23 +1358,73 @@ var shareSection = (function () {
                     if( $(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup') ) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
+                        setTimeout(StartScene.getStartButton().enabled = true ,1000);
                     }
                 });
+
+                $(noContent).on('click', function(event){
+                    event.preventDefault();
+                    $('.cd-popup').removeClass('is-visible');
+                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                });
+
+                $(noContent).on('touchstart', function(event){
+                    event.preventDefault();
+                    $('.cd-popup').removeClass('is-visible');
+                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                });
+
+                $(yesContent).on('click', function(event){
+                    this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.setIsChecked(false);
+                    event.preventDefault();
+                    $('.cd-popup').removeClass('is-visible');
+                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                });
+
+                $(yesContent).on('touchstart', function(event){
+                    this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.setIsChecked(false);
+                    event.preventDefault();
+                    $('.cd-popup').removeClass('is-visible');
+                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                });
+
 
                 //close popup when clicking the esc keyboard button
                 $(document).keyup(function(event){
                     if(event.which=='27'){
                         $('.cd-popup').removeClass('is-visible');
+                        StartScene.getStartButton().enabled = true;
                     }
                 });
             });
 
+        },
+
+        getIsChecked: function () {
+            return this.isChecked;
+        },
+        setIsChecked: function (check) {
+            this.isChecked = check;
+        },
+        getShareBanner: function () {
+            return this.shareBanner;
         }
     };
 
     return {
         init: function () {
             return _shareSection.init();
+        },
+        getIsChecked: function () {
+            return _shareSection.getIsChecked();
+        },
+        setIsChecked: function (check) {
+            return _shareSection.setIsChecked(check);
+        },
+        getShareBanner: function () {
+            return _shareSection.getShareBanner();
         }
     }
 })();
@@ -1345,7 +1433,7 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
 }
 
-window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', ScoreCanvas.init, false);
+window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', Application.init, false);
 window.addEventListener('load', Banner.init, false);
