@@ -1236,7 +1236,7 @@ var Banner = (function () {
             banner.id = "banner";
             banner.style.width = "760px";
             banner.style.height = "100px";
-            banner.style.backgroundColor = "rgb(9,59,34)";
+            banner.style.backgroundColor = "rgb(64,64,64)";
 
             document.body.appendChild(banner);
         },
@@ -1309,7 +1309,7 @@ var BannerTwo = (function () {
             banner.id = "bannerTwo";
             banner.style.width = "760px";
             banner.style.height = "100px";
-            banner.style.backgroundColor = "rgb(9,59,34)";
+            banner.style.backgroundColor = "rgb(64,64,64)";
 
             document.body.appendChild(banner);
         },
