@@ -942,7 +942,8 @@ var StartScene = (function () {
                 document.body.removeChild(shareSection.getShareBanner());
 
                 if (shareSection.getIsChecked()) {
-                    atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                    //TODO: hardcoded url need to change
+                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1006,7 +1007,9 @@ var ResultScene = (function () {
             shareButton.background_color = "#3b5998";
             shareButton.addTarget(function (sender) {
                 sender.enabled = false;
-                atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
+
+                //TODO: hardcoded url need to change
+                atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         sender.enabled = false;
                         sender.label.text = "Your post hass shared to FB.";
@@ -1023,7 +1026,8 @@ var ResultScene = (function () {
                 shareButton.label.font_size *= Application.getMobileScale();
             }
 
-            atomic.get('http://192.168.1.48:44333/api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+            //TODO: hardcoded url need to change
+            atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
@@ -1331,7 +1335,7 @@ var shareSection = (function () {
                         console.log(StartScene.getStartButton());
                     } else {
                         shareSection.setIsChecked(true);
-                        this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
                     }
                 });
 
@@ -1343,7 +1347,7 @@ var shareSection = (function () {
                         console.log(StartScene.getStartButton());
                     } else {
                         shareSection.setIsChecked(true);
-                        this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
                     }
                 });
 
@@ -1352,7 +1356,7 @@ var shareSection = (function () {
                     if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
-                        setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                        setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                     }
                 });
 
@@ -1360,36 +1364,36 @@ var shareSection = (function () {
                     if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
-                        setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                        setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                     }
                 });
 
                 $(noContent).on('click', function(event){
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                 });
 
                 $(noContent).on('touchstart', function(event){
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                 });
 
                 $(yesContent).on('click', function(event){
-                    this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                 });
 
                 $(yesContent).on('touchstart', function(event){
-                    this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(StartScene.getStartButton().enabled = true ,1000);
+                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
                 });
 
 
