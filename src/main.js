@@ -28,12 +28,15 @@ Assets.initialise({
     goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
     ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
     fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
+    fhLogoTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
     uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png",
-    availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png"
+    availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
+    availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png"
 }, function () {
     //completion callback
     StartScene.init();
-    Banner.setUpContent(document.getElementById("banner"))
+    Banner.setUpContent(document.getElementById("banner"));
+    BannerTwo.setUpContent(document.getElementById("bannerTwo"));
 });
 
 function inherit(proto) {
@@ -402,7 +405,7 @@ var Renderer = (function () {
 
         renderKickLabel: function () {
             var kickText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "KICK " + (GameObjects.getCurrentKick() + 1).toString());
-            kickText.alpha = Game.getKickLabelAlpa();
+            kickText.alpha = Game.getKickLabelAlpha();
             kickText.font_size = "5";
             kickText.text_color = "White";
             this.mainWindow.addSubview(kickText);
@@ -930,14 +933,24 @@ var StartScene = (function () {
             var canvasHeight = Application.getCanvasHeight();
             var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().full_background);
 
-            var startButtonWidth = Application.getCanvasWidth() * 0.6;
+            var startButtonWidth = Application.getCanvasWidth() * 0.7;
             var startButtonHeight = startButtonWidth / 4;
             var startButtonX = Application.getCanvasWidth() / 2 - startButtonWidth / 2;
-            var startButtonY = Application.getCanvasHeight() * 0.4;
+            var startButtonY = Application.getCanvasHeight() * 0.3;
+            var goLabel = new UI.Label(startButtonX + startButtonWidth * 0.2, startButtonY + startButtonHeight / 2, 500, 80, "GO!");
+            goLabel.font_size = "4";
+            goLabel.text_color = "black";
             this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
             this.startButton.cornerRadius = 35;
-            this.startButton.label.text = "Start";
-            this.startButton.label.font_size = "4";
+            this.startButton.label.x = startButtonX + startButtonWidth * 0.6;
+            this.startButton.label.text = "Help Ryne now!";
+            this.startButton.label.font_size = "2.5";
+            this.startButton.label.lineHeight = "70px";
+
+            if (Utility.isMobile.any()) {
+                goLabel.x = startButtonX + startButtonWidth * 0.25;
+            }
+
             this.startButton.addTarget(function () {
                 document.body.removeChild(shareSection.getShareBanner());
 
@@ -959,6 +972,7 @@ var StartScene = (function () {
 
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(this.startButton);
+            this.mainWindow.addSubview(goLabel);
         },
         getStartButton: function () {
             return this.startButton;
@@ -1005,20 +1019,24 @@ var ResultScene = (function () {
             shareButton.label.text_color = "white";
             shareButton.label.font_size = "2";
             shareButton.background_color = "#3b5998";
-            shareButton.addTarget(function (sender) {
-                sender.enabled = false;
 
-                //TODO: hardcoded url need to change
-                atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
-                    .success(function (data, xhr) {
-                        sender.enabled = false;
-                        sender.label.text = "Your post hass shared to FB.";
-                        sender.drawView(Application.getCanvasCtx());
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
-            }, "touch");
+            if (!shareSection.getIsChecked()) {
+                shareButton.addTarget(function (sender) {
+                    sender.enabled = false;
+
+                    //TODO: hardcoded url need to change
+                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
+                        .success(function (data, xhr) {
+                            sender.enabled = false;
+                            sender.label.text = "Your post has shared to FB.";
+                            sender.drawView(Application.getCanvasCtx());
+                        })
+                        .error(function (data, xhr) {
+                            console.log("error?");
+                        });
+                }, "touch");
+            }
+
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
@@ -1035,7 +1053,11 @@ var ResultScene = (function () {
 
             this.mainWindow.addSubview(resultLabel);
             this.mainWindow.addSubview(sharingLabel);
-            this.mainWindow.addSubview(shareButton);
+
+            if (!shareSection.getIsChecked()) {
+                this.mainWindow.addSubview(shareButton);
+            }
+
         }
     };
 
@@ -1080,7 +1102,7 @@ var Game = (function () {
 
             this.kickLabelTimer += this.delta;
             UI.View.animate(1.5, 1, this.kickLabelTimer, function () {
-                Game.setKickLabelAlpha(Game.getKickLabelAlpa() + Game.getDelta() / 1.5);
+                Game.setKickLabelAlpha(Game.getKickLabelAlpha() + Game.getDelta() / 1.5);
             }, function () {
             });
 
@@ -1195,7 +1217,7 @@ var Game = (function () {
         loop: function () {
             return _Game.loop();
         },
-        getKickLabelAlpa: function () {
+        getKickLabelAlpha: function () {
             return _Game.getKickLabelAlpha();
         },
         setKickLabelAlpha: function (x) {
@@ -1214,7 +1236,7 @@ var Banner = (function () {
             banner.id = "banner";
             banner.style.width = "760px";
             banner.style.height = "100px";
-            banner.style.backgroundColor = "black";
+            banner.style.backgroundColor = "rgb(9,59,34)";
 
             document.body.appendChild(banner);
         },
@@ -1227,24 +1249,45 @@ var Banner = (function () {
             logo.style.marginRight = "10px";
             var text = document.createElement("p");
             text.id = "bannerText";
-            text.innerHTML = "brought to you by";
-            text.style.fontSize = "1.5em";
-            text.style.width = "400px";
+            text.style.width = "50%";
+
+            var spanOne = document.createElement("span");
+            spanOne.innerHTML = "brought to you by FootballHero";
+            spanOne.style.fontSize = "1.5em";
+            var spanTwo = document.createElement("span");
+            spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
+            spanTwo.style.fontSize = "1.5em";
+            spanTwo.style.fontStyle = "italic";
+
+            var appStoreLogo = Assets.images().availableOnAppStore;
+            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
+            appStoreLogo.height = logo.height;
+            appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
 
             if (Utility.isMobile.any()) {
                 banner.style.width = window.innerWidth + "px";
-                banner.style.height = "180px";
+                banner.style.height = "210px";
+
                 logo.width *= 1.7;
                 logo.height *= 1.7;
                 logo.style.marginTop = "17px";
                 logo.style.marginLeft = "17px";
                 logo.style.marginRight = "17px";
-                text.style.fontSize = "2.5em";
-                text.style.width = "600px";
+
+                text.style.width = "50%";
+                spanOne.style.fontSize = "2.5em";
+                spanTwo.style.fontSize = "2em";
+
+                //appStoreLogo.style.verticalAlign = "middle";
             }
 
+            text.appendChild(spanOne);
+            text.appendChild(document.createElement("br"));
+            text.appendChild(document.createElement("br"));
+            text.appendChild(spanTwo);
             banner.appendChild(logo);
             banner.appendChild(text);
+            banner.appendChild(appStoreLogo);
         }
     };
 
@@ -1255,6 +1298,79 @@ var Banner = (function () {
 
         setUpContent: function (banner) {
             return _Banner.setUpContent(banner)
+        }
+    };
+})();
+
+var BannerTwo = (function () {
+    var _BannerTwo = {
+        init: function () {
+            var banner = document.createElement("div");
+            banner.id = "bannerTwo";
+            banner.style.width = "760px";
+            banner.style.height = "100px";
+            banner.style.backgroundColor = "rgb(9,59,34)";
+
+            document.body.appendChild(banner);
+        },
+
+        setUpContent: function (banner) {
+            var logo = Assets.images().fhLogoTwo;
+            logo.id = "smallLogoTwo";
+            logo.style.marginTop = "10px";
+            logo.style.marginLeft = "10px";
+            logo.style.marginRight = "10px";
+            var text = document.createElement("p");
+            text.id = "bannerTextTwo";
+            text.style.width = "50%";
+
+            var spanOne = document.createElement("span");
+            spanOne.innerHTML = "brought to you by FootballHero";
+            spanOne.style.fontSize = "1.5em";
+            var spanTwo = document.createElement("span");
+            spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
+            spanTwo.style.fontSize = "1.5em";
+            spanTwo.style.fontStyle = "italic";
+
+            var appStoreLogo = Assets.images().availableOnAppStoreTwo;
+            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
+            appStoreLogo.height = logo.height;
+            appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
+
+            if (Utility.isMobile.any()) {
+                banner.style.width = window.innerWidth + "px";
+                banner.style.height = "210px";
+
+                logo.width *= 1.7;
+                logo.height *= 1.7;
+                logo.style.marginTop = "17px";
+                logo.style.marginLeft = "17px";
+                logo.style.marginRight = "17px";
+
+                text.style.width = "50%";
+                spanOne.style.fontSize = "2.5em";
+                spanTwo.style.fontSize = "2em";
+
+                //appStoreLogo.style.verticalAlign = "middle";
+            }
+
+            text.appendChild(spanOne);
+            text.appendChild(document.createElement("br"));
+            text.appendChild(document.createElement("br"));
+            text.appendChild(spanTwo);
+            banner.appendChild(logo);
+            banner.appendChild(text);
+            banner.appendChild(appStoreLogo);
+        }
+    };
+
+    return {
+        init: function () {
+            return _BannerTwo.init();
+        },
+
+        setUpContent: function (banner) {
+            return _BannerTwo.setUpContent(banner)
         }
     };
 })();
@@ -1439,7 +1555,8 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
 }
 
+window.addEventListener('load', Banner.init, false);
 window.addEventListener('load', ScoreCanvas.init, false);
 window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', Application.init, false);
-window.addEventListener('load', Banner.init, false);
+window.addEventListener('load', BannerTwo.init, false);

@@ -26,7 +26,7 @@ canvas {
     text-align: center;
 }
 
-#banner {
+#banner, #bannerTwo{
     background-color: black;
     width: 760px;
     height: 100px;
@@ -49,16 +49,16 @@ canvas {
     z-index: 2;
 }
 
-#bannerText {
+#bannerText, #bannerTextTwo{
     font-family: 'Helvetica Neue';
     height: 100%;
     color: white;
     text-align: center;
-    vertical-align: middle;
+    /*vertical-align: middle;*/
     display: inline-block;
 }
 
-#smallLogo {
+#smallLogo, #smallLogoTwo{
     margin-left: 50px;
 }
 
