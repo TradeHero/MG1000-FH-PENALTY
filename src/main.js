@@ -24,7 +24,7 @@ window.requestAnimFrame = (function () {
 var Config = (function () {
 
     var _contextName = null;
-
+    var _hostURI = null;
 
     // public interface
     return {
@@ -34,8 +34,14 @@ var Config = (function () {
         getContextName: function () {
             return _contextName;
         },
+        setHostURI: function(URI){
+            _hostURI = URI
+        },
         isMobile: function () {
             return Utility.isMobile.any();
+        },
+        getHostURI: function(){
+            return _hostURI;
         }
     }
 
@@ -996,7 +1002,7 @@ var StartScene = (function () {
 
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
-                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
+                    atomic.get(Config.getHostURI() + 'api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1081,7 +1087,7 @@ var ResultScene = (function () {
                     sender.drawView(Application.getCanvasCtx());
 
                     //TODO: hardcoded url need to change
-                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
+                    atomic.get(Config.getHostURI() + 'api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             sender.enabled = false;
                             sender.image = Assets.images().share_fb_succeed;
@@ -1105,7 +1111,7 @@ var ResultScene = (function () {
             }
 
             //TODO: hardcoded url need to change
-            atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+            atomic.get(Config.getHostURI() + 'api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
