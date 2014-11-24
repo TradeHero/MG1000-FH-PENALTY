@@ -250,7 +250,7 @@
          *
          * @type {string}
          */
-        this.font = "Avenir Next";
+        this.font = "Roboto";
         /**
          *
          * @type {string}

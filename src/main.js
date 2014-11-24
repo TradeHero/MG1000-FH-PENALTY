@@ -22,7 +22,7 @@ window.requestAnimFrame = (function () {
 })();
 
 Assets.initialise({
-    full_background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png",
+    full_background: "http://chilp.it/69aa8b",
     background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png",
     goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
     goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
@@ -30,8 +30,11 @@ Assets.initialise({
     fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
     fhLogoTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
     uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png",
+    check: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png",
     availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
-    availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png"
+    availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
+    share_fb: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png",
+    share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png"
 }, function () {
     //completion callback
     StartScene.init();
@@ -952,7 +955,7 @@ var StartScene = (function () {
             }
 
             this.startButton.addTarget(function () {
-                document.body.removeChild(shareSection.getShareBanner());
+                //document.body.removeChild(shareSection.getShareBanner());
 
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
@@ -973,6 +976,7 @@ var StartScene = (function () {
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(this.startButton);
             this.mainWindow.addSubview(goLabel);
+            shareSection.init(this.mainWindow);
         },
         getStartButton: function () {
             return this.startButton;
@@ -998,37 +1002,51 @@ var ResultScene = (function () {
 
             var canvasWidth = Application.getCanvasWidth();
             var canvasHeight = Application.getCanvasHeight();
+            var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().background);
+
             var resultLabelX = canvasWidth / 2;
-            var resultLabelY = canvasHeight * 0.2;
+            var resultLabelY = canvasHeight * 0.1;
             // TODO: post owner username
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
-            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.8, 80, "You have earned " + score.toString() + " points for Ryne!");
-            resultLabel.font_size = "2";
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " points for Ryne!");
+            resultLabel.font_size = "2.5";
+            resultLabel.text_color = "white";
 
-            var sharingLabelX = canvasWidth / 2;
-            var sharingLabelY = canvasHeight / 2;
-            var sharingLabel = new UI.Label(sharingLabelX, sharingLabelY, canvasWidth * 0.8, 100, "Win your own iPhone 6?");
-            sharingLabel.font_size = "3";
+            switch (score) {
+                case 0:
+                    resultLabel.text = "Oops! You have scored no points for Ryne.";
+                    resultLabel.text_color = "#efefef";
+                    break;
 
+                case 1:
+                    resultLabel.text = "You have earned a point for Ryne!";
+                    break;
+
+                default:
+                    break;
+            }
+
+            var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
             var shareButtonWidth = canvasWidth * 0.8;
-            var shareButtonHeight = shareButtonWidth / 4;
+            var shareButtonHeight = shareButtonWidth / shareButtonRatio;
             var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
-            var shareButtonY = canvasHeight * 0.8 - shareButtonHeight / 2;
+            var shareButtonY = canvasHeight * 0.7 - shareButtonHeight / 2;
             var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
-            shareButton.label.text = "YES! Share to FB!";
-            shareButton.label.text_color = "white";
-            shareButton.label.font_size = "2";
-            shareButton.background_color = "#3b5998";
+            shareButton.image = Assets.images().share_fb;
+            shareButton.label.text = "";
 
             if (!shareSection.getIsChecked()) {
                 shareButton.addTarget(function (sender) {
                     sender.enabled = false;
+                    sender.enabled = false;
+                    sender.image = Assets.images().share_fb_succeed;
+                    sender.drawView(Application.getCanvasCtx());
 
                     //TODO: hardcoded url need to change
                     atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             sender.enabled = false;
-                            sender.label.text = "Your post has shared to FB.";
+                            sender.image = Assets.images().share_fb_succeed;
                             sender.drawView(Application.getCanvasCtx());
                         })
                         .error(function (data, xhr) {
@@ -1040,8 +1058,12 @@ var ResultScene = (function () {
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
-                sharingLabel.font_size *= Application.getMobileScale();
+                resultLabel.lineHeight *= Application.getMobileScale();
                 shareButton.label.font_size *= Application.getMobileScale();
+            } else {
+                if (score > 0) {
+                    resultLabel.y = canvasHeight * 0.2;
+                }
             }
 
             //TODO: hardcoded url need to change
@@ -1051,8 +1073,8 @@ var ResultScene = (function () {
                 .error(function (data, xhr) {
                 });
 
+            this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(resultLabel);
-            this.mainWindow.addSubview(sharingLabel);
 
             if (!shareSection.getIsChecked()) {
                 this.mainWindow.addSubview(shareButton);
@@ -1264,6 +1286,16 @@ var Banner = (function () {
             appStoreLogo.height = logo.height;
             appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
 
+            $(appStoreLogo).on("click", function (event) {
+                event.preventDefault();
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+            });
+
+            $(appStoreLogo).on("touchstart", function (event) {
+                event.preventDefault();
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+            });
+
             if (Utility.isMobile.any()) {
                 banner.style.width = window.innerWidth + "px";
                 banner.style.height = "210px";
@@ -1277,8 +1309,6 @@ var Banner = (function () {
                 text.style.width = "50%";
                 spanOne.style.fontSize = "2.5em";
                 spanTwo.style.fontSize = "2em";
-
-                //appStoreLogo.style.verticalAlign = "middle";
             }
 
             text.appendChild(spanOne);
@@ -1337,6 +1367,16 @@ var BannerTwo = (function () {
             appStoreLogo.height = logo.height;
             appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
 
+            $(appStoreLogo).on("click", function (event) {
+                event.preventDefault();
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8";
+            });
+
+            $(appStoreLogo).on("touchstart", function (event) {
+                event.preventDefault();
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8";
+            });
+
             if (Utility.isMobile.any()) {
                 banner.style.width = window.innerWidth + "px";
                 banner.style.height = "210px";
@@ -1380,26 +1420,47 @@ var shareSection = (function () {
         shareBanner: undefined,
         isChecked: true,
 
-        init: function () {
-            this.shareBanner = document.createElement("div");
-            this.shareBanner.id = "shareBanner";
-            this.shareBanner.style.width = (760 * 0.9) + "px";
-            this.shareBanner.style.height = "130px";
-            this.shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
-            this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-            this.shareBanner.style.backgroundSize = (760 * 0.9) +"px 130px";
-            this.shareBanner.style.marginTop = "30%";
+        init: function (mainWindow) {
+            var canvasWidth = Application.getCanvasWidth();
+            var canvasHeight = Application.getCanvasHeight();
+            var shareBannerRatio = Assets.images().uncheck.width / Assets.images().uncheck.height;
+            var shareBannerWidth = Application.getCanvasWidth() * 0.8;
+            var shareBannerHeight = shareBannerWidth / shareBannerRatio;
+            var shareBannerX = canvasWidth / 2 - shareBannerWidth / 2;
+            var shareBannerY = canvasHeight * 0.7;
 
-            var tickButton = document.createElement("button");
-            tickButton.id = "tickButton";
-            tickButton.style.width = "60px";
-            tickButton.style.height = "60px";
-            tickButton.style.marginTop = "38px";
-            tickButton.style.marginLeft = "32px";
-            //tickButton.setAttribute('href', '#0');
-            tickButton.className = "cd-popup-trigger";
-            tickButton.style.backgroundColor = "rgba(0,0,0,0)";
-            tickButton.style.border = "0";
+            this.shareBanner = new UI.Button(shareBannerX, shareBannerY, shareBannerWidth, shareBannerHeight);
+            this.shareBanner.image = Assets.images().check;
+            this.shareBanner.label.text = "";
+            this.shareBanner.addTarget(function (sender) {
+                if (shareSection.getIsChecked()) {
+                    $('.cd-popup').addClass('is-visible');
+                    StartScene.getStartButton().enabled = false;
+                } else {
+                    shareSection.setIsChecked(true);
+                    shareSection.getShareBanner().image = Assets.images().check;
+                    shareSection.getShareBanner().drawView(Application.getCanvasCtx());
+                }
+            }, "touch");
+            //this.shareBanner = document.createElement("div");
+            //this.shareBanner.id = "shareBanner";
+            //this.shareBanner.style.width = (760 * 0.9) + "px";
+            //this.shareBanner.style.height = "130px";
+            //this.shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
+            //this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+            //this.shareBanner.style.backgroundSize = (760 * 0.9) +"px 130px";
+            //this.shareBanner.style.marginTop = "30%";
+
+            //var tickButton = document.createElement("button");
+            //tickButton.id = "tickButton";
+            //tickButton.style.width = "60px";
+            //tickButton.style.height = "60px";
+            //tickButton.style.marginTop = "38px";
+            //tickButton.style.marginLeft = "32px";
+            ////tickButton.setAttribute('href', '#0');
+            //tickButton.className = "cd-popup-trigger";
+            //tickButton.style.backgroundColor = "rgba(0,0,0,0)";
+            //tickButton.style.border = "0";
 
             var popUp = document.createElement("div");
             popUp.className = "cd-popup";
@@ -1433,39 +1494,40 @@ var shareSection = (function () {
                 this.shareBanner.style.height = "170px";
                 this.shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
                 this.shareBanner.style.marginTop = "52%";
-                tickButton.style.marginTop = "65px";
-                tickButton.style.marginLeft = "55px";
+                //tickButton.style.marginTop = "65px";
+                //tickButton.style.marginLeft = "55px";
             }
 
-            document.body.appendChild(this.shareBanner);
+            //document.body.appendChild(this.shareBanner);
             document.body.appendChild(popUp);
-            this.shareBanner.appendChild(tickButton);
+            //this.shareBanner.appendChild(tickButton);
+            mainWindow.addSubview(this.shareBanner);
 
             jQuery(document).ready(function ($) {
                 //open popup
-                $('.cd-popup-trigger').on('click', function (event) {
-                    event.preventDefault();
-                    if (shareSection.getIsChecked()) {
-                        $('.cd-popup').addClass('is-visible');
-                        StartScene.getStartButton().enabled = false;
-                        console.log(StartScene.getStartButton());
-                    } else {
-                        shareSection.setIsChecked(true);
-                        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-                    }
-                });
-
-                $('.cd-popup-trigger').on('touchstart', function (event) {
-                    event.preventDefault();
-                    if (shareSection.getIsChecked()) {
-                        $('.cd-popup').addClass('is-visible');
-                        StartScene.getStartButton().enabled = false;
-                        console.log(StartScene.getStartButton());
-                    } else {
-                        shareSection.setIsChecked(true);
-                        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-                    }
-                });
+                //$('.cd-popup-trigger').on('click', function (event) {
+                //    event.preventDefault();
+                //    if (shareSection.getIsChecked()) {
+                //        $('.cd-popup').addClass('is-visible');
+                //        StartScene.getStartButton().enabled = false;
+                //        console.log(StartScene.getStartButton());
+                //    } else {
+                //        shareSection.setIsChecked(true);
+                //        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                //    }
+                //});
+                //
+                //$('.cd-popup-trigger').on('touchstart', function (event) {
+                //    event.preventDefault();
+                //    if (shareSection.getIsChecked()) {
+                //        $('.cd-popup').addClass('is-visible');
+                //        StartScene.getStartButton().enabled = false;
+                //        console.log(StartScene.getStartButton());
+                //    } else {
+                //        shareSection.setIsChecked(true);
+                //        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
+                //    }
+                //});
 
                 //close popup
                 $('.cd-popup').on('click', function (event) {
@@ -1497,7 +1559,9 @@ var shareSection = (function () {
                 });
 
                 $(yesContent).on('click', function(event){
-                    shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.getShareBanner().image = Assets.images().uncheck;
+                    shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
@@ -1505,7 +1569,9 @@ var shareSection = (function () {
                 });
 
                 $(yesContent).on('touchstart', function(event){
-                    shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
+                    shareSection.getShareBanner().image = Assets.images().uncheck;
+                    shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
@@ -1536,8 +1602,8 @@ var shareSection = (function () {
     };
 
     return {
-        init: function () {
-            return _shareSection.init();
+        init: function (mainWindow) {
+            return _shareSection.init(mainWindow);
         },
         getIsChecked: function () {
             return _shareSection.getIsChecked();
@@ -1557,6 +1623,6 @@ function getURLParameter(name) {
 
 window.addEventListener('load', Banner.init, false);
 window.addEventListener('load', ScoreCanvas.init, false);
-window.addEventListener('load', shareSection.init, false);
+//window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', Application.init, false);
 window.addEventListener('load', BannerTwo.init, false);
