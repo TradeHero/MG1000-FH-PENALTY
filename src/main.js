@@ -254,9 +254,16 @@ var ScoreCanvas = (function () {
             bluediv.style.width = canvasWidth + "px";
             bluediv.style.height = (canvasHeight + 1) + "px";
             bluediv.style.borderColor = 'transparent';
+
+            //add action to blue div
+
+
+
             var body = document.body;
             body.appendChild(this.canvas);
             body.appendChild(bluediv);
+
+            //$('bluediv').addEvent()
         },
 
         getCanvasWidth: function () {
@@ -1470,6 +1477,8 @@ var shareSection = (function () {
             popUp.style.zIndex = "5";
             var popCon = document.createElement("div");
             popCon.className = "cd-popup-container";
+            //var containerWidth =
+            popCon.style.width = Config.isMobile() ? '90%' : '40%';
             var msg = document.createElement("p");
             msg.innerHTML = "Are you sure you don't want to win an iPhone 6?!";
             var ul = document.createElement("ul");
@@ -1478,10 +1487,14 @@ var shareSection = (function () {
             var noButton = document.createElement("li");
             var yesContent = document.createElement("a");
             var noContent = document.createElement("a");
+            var yestemporaryDiv = document.createElement('div');
+            yestemporaryDiv.innerHTML = "Yes";
+            var notemporaryDiv = document.createElement('div');
+            notemporaryDiv.innerHTML = "No";
             yesContent.setAttribute('href', '#0');
-            yesContent.innerHTML = "Yes";
+            yesContent.appendChild(yestemporaryDiv);
             noContent.setAttribute('href', '#0');
-            noContent.innerHTML = "No";
+            noContent.appendChild(notemporaryDiv);
 
             yesButton.appendChild(yesContent);
             noButton.appendChild(noContent);
@@ -1554,7 +1567,7 @@ var shareSection = (function () {
                     }
                 });
 
-                $(noContent).on('click', function (event) {
+                $(yestemporaryDiv).on('click', function (event) {
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
                     setTimeout(function () {
@@ -1562,7 +1575,7 @@ var shareSection = (function () {
                     }, 100);
                 });
 
-                $(noContent).on('touchstart', function (event) {
+                $(notemporaryDiv).on('touchstart', function (event) {
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
                     setTimeout(function () {
