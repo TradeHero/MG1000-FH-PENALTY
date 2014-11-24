@@ -38,30 +38,6 @@ var Config = (function(){
 
 })();
 
-Assets.initialise({
-    full_background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png",
-    background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png",
-    goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
-    goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
-    ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
-    fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
-    fhLogoTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
-    uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png",
-    check: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png",
-    availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
-    availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
-    getOnGooglePlay: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
-    getOnGooglePlay2: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
-    share_fb: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png",
-    share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png",
-    play_now_button: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png"
-}, function () {
-    //completion callback
-    StartScene.init();
-    Banner.setUpContent(document.getElementById("banner"));
-    BannerTwo.setUpContent(document.getElementById("bannerTwo"));
-});
-
 function inherit(proto) {
     function F() {
     }
