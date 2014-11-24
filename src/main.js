@@ -1070,11 +1070,32 @@ var ResultScene = (function () {
                     break;
             }
 
+            var dlSectionButtonRatio = Assets.images().ios_dl_section.width / Assets.images().ios_dl_section.height;
+            var dlSectionButtonWidth = canvasWidth * 0.9;
+            var dlSectionButtonHeight = dlSectionButtonWidth / dlSectionButtonRatio;
+            var dlSectionButtonX = canvasWidth / 2 - dlSectionButtonWidth / 2;
+            var dlSectionButtonY = canvasHeight * 0.45 - dlSectionButtonHeight / 2;
+            var dlSectionButton = new UI.Button(dlSectionButtonX, dlSectionButtonY, dlSectionButtonWidth, dlSectionButtonHeight);
+            dlSectionButton.image = Assets.images().ios_dl_section;
+            dlSectionButton.label.text = "";
+            dlSectionButton.addTarget(function (sender) {
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+            }, "touch");
+
+            if (Utility.isMobile.Android()) {
+                dlSectionButton.image = Assets.images().android_dl_section;
+                dlSectionButton.addTarget(function (sender) {
+                    window.location.href = "https://play.google.com/store/apps/details?id=com.myhero.fh";
+                }, "touch");
+            }
+
+
+
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
             var shareButtonWidth = canvasWidth * 0.8;
             var shareButtonHeight = shareButtonWidth / shareButtonRatio;
             var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
-            var shareButtonY = canvasHeight * 0.7 - shareButtonHeight / 2;
+            var shareButtonY = canvasHeight * 0.88 - shareButtonHeight / 2;
             var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
             shareButton.image = Assets.images().share_fb;
             shareButton.label.text = "";
@@ -1099,14 +1120,13 @@ var ResultScene = (function () {
                 }, "touch");
             }
 
-
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
                 resultLabel.lineHeight *= Application.getMobileScale();
                 shareButton.label.font_size *= Application.getMobileScale();
             } else {
                 if (score > 0) {
-                    resultLabel.y = canvasHeight * 0.2;
+                    resultLabel.y = canvasHeight * 0.1;
                 }
             }
 
@@ -1119,8 +1139,9 @@ var ResultScene = (function () {
 
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(resultLabel);
+            this.mainWindow.addSubview(dlSectionButton);
 
-            if (!shareSection.getIsChecked()) {
+            if (shareSection.getIsChecked()) {
                 this.mainWindow.addSubview(shareButton);
             }
 
