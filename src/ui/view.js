@@ -300,6 +300,7 @@
         ctx.textBaseline = this.text_baseline;
         UI.TextWrap(ctx, this.x, this.y, this.width, this.lineHeight, this.text);
         ctx.globalAlpha = 1.0;
+
     };
 
     /**

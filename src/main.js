@@ -21,18 +21,21 @@ window.requestAnimFrame = (function () {
         };
 })();
 
-var Config = (function(){
+var Config = (function () {
 
     var _contextName = null;
 
 
     // public interface
     return {
-        setContextName: function(name){
+        setContextName: function (name) {
             _contextName = name;
         },
-        getContextName: function(){
+        getContextName: function () {
             return _contextName;
+        },
+        isMobile: function () {
+            return Utility.isMobile.any();
         }
     }
 
@@ -232,11 +235,22 @@ var ScoreCanvas = (function () {
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
             this.ctx = this.canvas.getContext("2d");
-            this.canvas.alpha = 0;
-            this.canvas.style.visibility = "hidden";
-            //this.canvas.style.display = "none";
+            //this.canvas.alpha = 0;
+            //this.canvas.style.visibility = "hidden";
+            this.canvas.style.display = "none";
+            //ctx.fillColor = 'rgb(29, 173, 241)';
+            //ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+
+            var bluediv = document.createElement('div');
+            bluediv.id = 'bluediv';
+            bluediv.style.backgroundColor = 'rgb(29, 173, 241)';
+            bluediv.style.width = canvasWidth + "px";
+            bluediv.style.height = (canvasHeight + 1) + "px";
+            bluediv.style.borderColor = 'transparent';
             var body = document.body;
             body.appendChild(this.canvas);
+            body.appendChild(bluediv);
         },
 
         getCanvasWidth: function () {
@@ -324,16 +338,18 @@ var Renderer = (function () {
             var ballImage = Assets.images().ball;
 
             if (GameObjects.getBallWidth() === undefined) {
-                GameObjects.setBallWidth(ballImage.width * Application.getScale()* 1.2);
+                GameObjects.setBallWidth(ballImage.width * Application.getScale() * 1.2);
                 GameObjects.setBallHeight(ballImage.height * Application.getScale() * 1.2);
                 GameObjects.setBallCurrentX(GameObjects.getBallStartX());
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
             }
 
             if (GameObjects.getCurrentKick() === 0) {
-                var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(),  Application.getCanvasWidth(), 80, "Swipe the ball to shoot!");
+                var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(), Application.getCanvasWidth(), 80, "Swipe the ball to shoot!");
                 tutorialLabel.text_color = "white";
-                tutorialLabel.font_size = '4.5';
+                tutorialLabel.font_weight = '700';
+                tutorialLabel.y = tutorialLabel.y +10;
+                tutorialLabel.font_size = Config.isMobile() ? '4.5' : '3';
                 this.mainWindow.addSubview(tutorialLabel);
 
             }
@@ -367,7 +383,7 @@ var Renderer = (function () {
 
         renderScore: function () {
             var mainWindow = new UI.View(0, 0, ScoreCanvas.getCanvasWidth(), ScoreCanvas.getCanvasHeight());
-            mainWindow.background_color = "black";
+            mainWindow.background_color = "gray";
             var scoreLabel = new UI.Label(ScoreCanvas.getCanvasWidth() * 0.1, ScoreCanvas.getCanvasHeight() / 2, 200, 30, "Scores");
             scoreLabel.text_allign = "left";
             scoreLabel.text_color = "white";
@@ -937,28 +953,37 @@ var StartScene = (function () {
             var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().full_background);
 
             var buttonBackground = Assets.images().play_now_button;
-            var buttonRatio = buttonBackground.width/buttonBackground.height;
+            var buttonRatio = buttonBackground.width / buttonBackground.height;
             var startButtonWidth = Application.getCanvasWidth() * 0.7;
             var startButtonHeight = startButtonWidth / buttonRatio;
             var startButtonX = Application.getCanvasWidth() / 2 - startButtonWidth / 2;
             var startButtonY = Application.getCanvasHeight() * 0.3;
 
+            var labelsX = startButtonX + startButtonWidth * 0.25;
+            var labelsY = startButtonY + 30 * 1.7;
+            var playNowLabel = new UI.Label(labelsX, labelsY, 300, 50, "");
+            playNowLabel.text = "Play Now!";
+            playNowLabel.font_size = Config.isMobile() ? '3' : '2';
+            playNowLabel.text_color = 'white';
+            playNowLabel.font_weight = '700';
+            playNowLabel.text_allign = 'left';
 
-            //var playNowLabel = new UI.Label();
-            //playNowLabel.text = "Play Now!";
-            //
-            //var helpTextLabel = new UI.Label();
-            //helpTextLabel.text = "Help " + Config.getContextName() + " win his iPhone 6...";
+            var helpTextLabel = new UI.Label(labelsX, labelsY + 10 + 50, 500, 50, "");
+            helpTextLabel.text = "Help " + Config.getContextName() + " win his iPhone 6...";
+            helpTextLabel.font_size = Config.isMobile() ? '2' : '1.5';
+            helpTextLabel.text_color = 'white';
+            helpTextLabel.text_allign = 'left';
             //helpTextLabel.x = startButtonX + startButtonWidth * 0.58;
-            //helpTextLabel/.
+
             this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
             this.startButton.cornerRadius = 35;
-            this.startButton.label.x = startButtonX + startButtonWidth * 0.58;
-            this.startButton.label.y = startButtonY + startButtonHeight * 0.6;
-            this.startButton.label.text = "Help " + Config.getContextName() + " win his iPhone 6...";
-            this.startButton.label.font_size = "2";
-            this.startButton.label.lineHeight = "35px";
-            this.startButton.label.text_color = "white";
+            //this.startButton.label.x = startButtonX + startButtonWidth * 0.58;
+            //this.startButton.label.y = startButtonY + startButtonHeight * 0.6;
+            //this.startButton.label.text = "Help " + Config.getContextName() + " win his iPhone 6...";
+            this.startButton.label.text = "";
+            //this.startButton.label.font_size = "2";
+            //this.startButton.label.lineHeight = "35px";
+            //this.startButton.label.text_color = "white";
             this.startButton.image = Assets.images().play_now_button;
 
             if (Utility.isMobile.any()) {
@@ -966,11 +991,12 @@ var StartScene = (function () {
             }
 
             this.startButton.addTarget(function () {
-                //document.body.removeChild(shareSection.getShareBanner());
-                ScoreCanvas.getCanvas().style.visibility = "visible";
+                document.body.removeChild(document.getElementById("bluediv"));
+                ScoreCanvas.getCanvas().style.display = "block";
+
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
-                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                    atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -986,7 +1012,8 @@ var StartScene = (function () {
 
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(this.startButton);
-            //this.mainWindow.addSubview(goLabel);
+            this.mainWindow.addSubview(playNowLabel);
+            this.mainWindow.addSubview(helpTextLabel);
             shareSection.init(this.mainWindow);
         },
         getStartButton: function () {
@@ -1275,63 +1302,27 @@ var Banner = (function () {
         },
 
         setUpContent: function (banner) {
-            var logo = Assets.images().fhLogo;
-            logo.id = "smallLogo";
-            logo.style.marginTop = "10px";
-            logo.style.marginLeft = "10px";
-            logo.style.marginRight = "10px";
-            var text = document.createElement("p");
-            text.id = "bannerText";
-            text.style.width = "50%";
 
-            var spanOne = document.createElement("span");
-            spanOne.innerHTML = "brought to you by <b>FootballHero</b>";
-            spanOne.style.fontSize = "1.5em";
-            //var spanTwo = document.createElement("span");
-            //spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
-            //spanTwo.style.fontSize = "1.5em";
-            //spanTwo.style.fontStyle = "italic";
+            banner.style.background = Utility.isMobile.Android()
+                ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-google.png\')'
+                : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-apple.png\')';
 
-            var appStoreLogo = Assets.images().availableOnAppStore;
 
-            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
-            appStoreLogo.width = 760 * 0.3;
-            appStoreLogo.height =  appStoreLogo.width / appStoreLogoRatio;
-            appStoreLogo.style.verticalAlign = '100%';
-            // click on banner instead of just the button
-            $(banner).on('click', function(){
-               window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+            $(banner).on('click', function () {
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
-            $(banner).on('touchstart', function(){
+            $(banner).on('touchstart', function () {
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
             if (Utility.isMobile.any()) {
+                var ratio = 760 / 100;
+
                 banner.style.width = window.innerWidth + "px";
-                banner.style.height = "180px";
-
-                logo.width *= 1.7;
-                logo.height *= 1.7;
-                logo.style.marginTop = "17px";
-                logo.style.marginLeft = "17px";
-                logo.style.marginRight = "17px";
-
-
-                text.style.width = "50%";
-                spanOne.style.fontSize = "2.5em";
-                //spanTwo.style.fontSize = "2em";
-            } else {
-
+                banner.style.height = window.innerWidth / ratio + "px";
+                banner.style.backgroundSize = 'cover'
             }
-
-            text.appendChild(spanOne);
-            text.appendChild(document.createElement("br"));
-            text.appendChild(document.createElement("br"));
-            //text.appendChild(spanTwo);
-            banner.appendChild(logo);
-            banner.appendChild(text);
-            banner.appendChild(appStoreLogo);
         }
     };
 
@@ -1359,70 +1350,25 @@ var BannerTwo = (function () {
         },
 
         setUpContent: function (banner) {
-            var logo = Assets.images().fhLogoTwo;
-            logo.id = "smallLogoTwo";
-            logo.style.marginTop = "10px";
-            logo.style.marginLeft = "10px";
-            logo.style.marginRight = "10px";
-            var text = document.createElement("p");
-            text.id = "bannerTextTwo";
-            text.style.width = "50%";
+            banner.style.background = Utility.isMobile.Android()
+                ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-google.png\')'
+                : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-apple.png\')';
 
-            var spanOne = document.createElement("span");
-            spanOne.innerHTML = "<b>FootballHero</b>";
-            spanOne.style.fontSize = "1.5em";
-            var spanTwo = document.createElement("span");
-            spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
-            spanTwo.style.fontSize = "1.5em";
-            spanTwo.style.fontStyle = "italic";
-
-            var appStoreLogo = Assets.images().availableOnAppStoreTwo;
-            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
-            appStoreLogo.width = 760 * 0.3;
-            appStoreLogo.height =  appStoreLogo.width / appStoreLogoRatio;
-            appStoreLogo.style.verticalAlign = '100%';
-            appStoreLogo.style.marginLeft = "17px";
-            appStoreLogo.style.marginTop = "50px";
-            appStoreLogo.style.float = 'left';
-
-            $(banner).on('click', function(){
+            $(banner).on('click', function () {
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
-            $(banner).on('touchstart', function(){
+            $(banner).on('touchstart', function () {
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
             if (Utility.isMobile.any()) {
+                var ratio = 760 / 100;
+
                 banner.style.width = window.innerWidth + "px";
-                banner.style.height = "180px";
-
-                logo.width *= 1.7;
-                logo.height *= 1.7;
-                logo.style.marginTop = "17px";
-                logo.style.marginLeft = "17px";
-                logo.style.marginRight = "17px";
-                logo.style.float = 'right';
-                text.style.width = "50%";
-                text.style.marginTop = '10px';
-                text.style.marginLeft = '25px';
-                //text.style.fontSize = "2em";
-                spanOne.style.fontSize = "2.5em";
-                spanTwo.style.fontSize = "2em";
-
-                //appStoreLogo.style.verticalAlign = "middle";
+                banner.style.height = window.innerWidth / ratio + "px";
+                banner.style.backgroundSize = 'cover'
             }
-
-            text.appendChild(spanOne);
-            text.appendChild(document.createElement("br"));
-            text.appendChild(document.createElement("br"));
-
-            text.appendChild(spanTwo);
-
-            banner.appendChild(appStoreLogo);
-            banner.appendChild(text);
-            banner.appendChild(logo);
-
         }
     };
 
@@ -1557,7 +1503,9 @@ var shareSection = (function () {
                     if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
-                        setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                        setTimeout(function () {
+                            StartScene.getStartButton().enabled = true;
+                        }, 100);
                     }
                 });
 
@@ -1565,40 +1513,50 @@ var shareSection = (function () {
                     if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
                         event.preventDefault();
                         $(this).removeClass('is-visible');
-                        setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                        setTimeout(function () {
+                            StartScene.getStartButton().enabled = true;
+                        }, 100);
                     }
                 });
 
-                $(noContent).on('click', function(event){
+                $(noContent).on('click', function (event) {
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                    setTimeout(function () {
+                        StartScene.getStartButton().enabled = true;
+                    }, 100);
                 });
 
-                $(noContent).on('touchstart', function(event){
+                $(noContent).on('touchstart', function (event) {
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                    setTimeout(function () {
+                        StartScene.getStartButton().enabled = true;
+                    }, 100);
                 });
 
-                $(yesContent).on('click', function(event){
+                $(yesContent).on('click', function (event) {
                     //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.getShareBanner().image = Assets.images().uncheck;
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                    setTimeout(function () {
+                        StartScene.getStartButton().enabled = true;
+                    }, 100);
                 });
 
-                $(yesContent).on('touchstart', function(event){
+                $(yesContent).on('touchstart', function (event) {
                     //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.getShareBanner().image = Assets.images().uncheck;
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                     shareSection.setIsChecked(false);
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
-                    setTimeout(function (){StartScene.getStartButton().enabled = true;} ,100);
+                    setTimeout(function () {
+                        StartScene.getStartButton().enabled = true;
+                    }, 100);
                 });
 
 
