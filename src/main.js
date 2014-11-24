@@ -21,8 +21,25 @@ window.requestAnimFrame = (function () {
         };
 })();
 
+var Config = (function(){
+
+    var _contextName = null;
+
+
+    // public interface
+    return {
+        setContextName: function(name){
+            _contextName = name;
+        },
+        getContextName: function(){
+            return _contextName;
+        }
+    }
+
+})();
+
 Assets.initialise({
-    full_background: "http://chilp.it/69aa8b",
+    full_background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png",
     background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png",
     goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
     goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
@@ -33,8 +50,11 @@ Assets.initialise({
     check: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png",
     availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
     availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
+    getOnGooglePlay: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
+    getOnGooglePlay2: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
     share_fb: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png",
-    share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png"
+    share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png",
+    play_now_button: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png"
 }, function () {
     //completion callback
     StartScene.init();
@@ -236,7 +256,9 @@ var ScoreCanvas = (function () {
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
             this.ctx = this.canvas.getContext("2d");
-
+            this.canvas.alpha = 0;
+            this.canvas.style.visibility = "hidden";
+            //this.canvas.style.display = "none";
             var body = document.body;
             body.appendChild(this.canvas);
         },
@@ -326,16 +348,18 @@ var Renderer = (function () {
             var ballImage = Assets.images().ball;
 
             if (GameObjects.getBallWidth() === undefined) {
-                GameObjects.setBallWidth(ballImage.width * Application.getScale());
-                GameObjects.setBallHeight(ballImage.height * Application.getScale());
+                GameObjects.setBallWidth(ballImage.width * Application.getScale()* 1.2);
+                GameObjects.setBallHeight(ballImage.height * Application.getScale() * 1.2);
                 GameObjects.setBallCurrentX(GameObjects.getBallStartX());
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
             }
 
             if (GameObjects.getCurrentKick() === 0) {
-                var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(), 500, 80, "Swipe the ball to shoot!");
+                var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(),  Application.getCanvasWidth(), 80, "Swipe the ball to shoot!");
                 tutorialLabel.text_color = "white";
+                tutorialLabel.font_size = '4.5';
                 this.mainWindow.addSubview(tutorialLabel);
+
             }
 
             var ball = new UI.Button(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight());
@@ -936,27 +960,38 @@ var StartScene = (function () {
             var canvasHeight = Application.getCanvasHeight();
             var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().full_background);
 
+            var buttonBackground = Assets.images().play_now_button;
+            var buttonRatio = buttonBackground.width/buttonBackground.height;
             var startButtonWidth = Application.getCanvasWidth() * 0.7;
-            var startButtonHeight = startButtonWidth / 4;
+            var startButtonHeight = startButtonWidth / buttonRatio;
             var startButtonX = Application.getCanvasWidth() / 2 - startButtonWidth / 2;
             var startButtonY = Application.getCanvasHeight() * 0.3;
-            var goLabel = new UI.Label(startButtonX + startButtonWidth * 0.2, startButtonY + startButtonHeight / 2, 500, 80, "GO!");
-            goLabel.font_size = "4";
-            goLabel.text_color = "black";
+
+
+            //var playNowLabel = new UI.Label();
+            //playNowLabel.text = "Play Now!";
+            //
+            //var helpTextLabel = new UI.Label();
+            //helpTextLabel.text = "Help " + Config.getContextName() + " win his iPhone 6...";
+            //helpTextLabel.x = startButtonX + startButtonWidth * 0.58;
+            //helpTextLabel/.
             this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
             this.startButton.cornerRadius = 35;
-            this.startButton.label.x = startButtonX + startButtonWidth * 0.6;
-            this.startButton.label.text = "Help Ryne now!";
-            this.startButton.label.font_size = "2.5";
-            this.startButton.label.lineHeight = "70px";
+            this.startButton.label.x = startButtonX + startButtonWidth * 0.58;
+            this.startButton.label.y = startButtonY + startButtonHeight * 0.6;
+            this.startButton.label.text = "Help " + Config.getContextName() + " win his iPhone 6...";
+            this.startButton.label.font_size = "2";
+            this.startButton.label.lineHeight = "35px";
+            this.startButton.label.text_color = "white";
+            this.startButton.image = Assets.images().play_now_button;
 
             if (Utility.isMobile.any()) {
-                goLabel.x = startButtonX + startButtonWidth * 0.25;
+                //goLabel.x = startButtonX + startButtonWidth * 0.25;
             }
 
             this.startButton.addTarget(function () {
                 //document.body.removeChild(shareSection.getShareBanner());
-
+                ScoreCanvas.getCanvas().style.visibility = "visible";
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
                     atomic.get('http://192.168.1.89:44333/api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
@@ -975,7 +1010,7 @@ var StartScene = (function () {
 
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(this.startButton);
-            this.mainWindow.addSubview(goLabel);
+            //this.mainWindow.addSubview(goLabel);
             shareSection.init(this.mainWindow);
         },
         getStartButton: function () {
@@ -1008,18 +1043,18 @@ var ResultScene = (function () {
             var resultLabelY = canvasHeight * 0.1;
             // TODO: post owner username
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
-            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " points for Ryne!");
-            resultLabel.font_size = "2.5";
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " goals for Ryne!");
+            resultLabel.font_size = "2";
             resultLabel.text_color = "white";
 
             switch (score) {
                 case 0:
-                    resultLabel.text = "Oops! You have scored no points for Ryne.";
+                    resultLabel.text = "Oops! You have scored no goals for Ryne.";
                     resultLabel.text_color = "#efefef";
                     break;
 
                 case 1:
-                    resultLabel.text = "You have earned a point for Ryne!";
+                    resultLabel.text = "You have scored a goal for Ryne!";
                     break;
 
                 default:
@@ -1274,31 +1309,31 @@ var Banner = (function () {
             text.style.width = "50%";
 
             var spanOne = document.createElement("span");
-            spanOne.innerHTML = "brought to you by FootballHero";
+            spanOne.innerHTML = "brought to you by <b>FootballHero</b>";
             spanOne.style.fontSize = "1.5em";
-            var spanTwo = document.createElement("span");
-            spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
-            spanTwo.style.fontSize = "1.5em";
-            spanTwo.style.fontStyle = "italic";
+            //var spanTwo = document.createElement("span");
+            //spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
+            //spanTwo.style.fontSize = "1.5em";
+            //spanTwo.style.fontStyle = "italic";
 
             var appStoreLogo = Assets.images().availableOnAppStore;
-            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
-            appStoreLogo.height = logo.height;
-            appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
 
-            $(appStoreLogo).on("click", function (event) {
-                event.preventDefault();
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+            var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
+            appStoreLogo.width = 760 * 0.3;
+            appStoreLogo.height =  appStoreLogo.width / appStoreLogoRatio;
+            appStoreLogo.style.verticalAlign = '100%';
+            // click on banner instead of just the button
+            $(banner).on('click', function(){
+               window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
-            $(appStoreLogo).on("touchstart", function (event) {
-                event.preventDefault();
+            $(banner).on('touchstart', function(){
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
             if (Utility.isMobile.any()) {
                 banner.style.width = window.innerWidth + "px";
-                banner.style.height = "210px";
+                banner.style.height = "180px";
 
                 logo.width *= 1.7;
                 logo.height *= 1.7;
@@ -1306,15 +1341,18 @@ var Banner = (function () {
                 logo.style.marginLeft = "17px";
                 logo.style.marginRight = "17px";
 
+
                 text.style.width = "50%";
                 spanOne.style.fontSize = "2.5em";
-                spanTwo.style.fontSize = "2em";
+                //spanTwo.style.fontSize = "2em";
+            } else {
+
             }
 
             text.appendChild(spanOne);
             text.appendChild(document.createElement("br"));
             text.appendChild(document.createElement("br"));
-            text.appendChild(spanTwo);
+            //text.appendChild(spanTwo);
             banner.appendChild(logo);
             banner.appendChild(text);
             banner.appendChild(appStoreLogo);
@@ -1355,7 +1393,7 @@ var BannerTwo = (function () {
             text.style.width = "50%";
 
             var spanOne = document.createElement("span");
-            spanOne.innerHTML = "brought to you by FootballHero";
+            spanOne.innerHTML = "<b>FootballHero</b>";
             spanOne.style.fontSize = "1.5em";
             var spanTwo = document.createElement("span");
             spanTwo.innerHTML = "Predict Matches. Challenge Friends & Get Recognised Globally.";
@@ -1364,30 +1402,35 @@ var BannerTwo = (function () {
 
             var appStoreLogo = Assets.images().availableOnAppStoreTwo;
             var appStoreLogoRatio = appStoreLogo.width / appStoreLogo.height;
-            appStoreLogo.height = logo.height;
-            appStoreLogo.width = appStoreLogoRatio * appStoreLogo.height;
+            appStoreLogo.width = 760 * 0.3;
+            appStoreLogo.height =  appStoreLogo.width / appStoreLogoRatio;
+            appStoreLogo.style.verticalAlign = '100%';
+            appStoreLogo.style.marginLeft = "17px";
+            appStoreLogo.style.marginTop = "50px";
+            appStoreLogo.style.float = 'left';
 
-            $(appStoreLogo).on("click", function (event) {
-                event.preventDefault();
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8";
+            $(banner).on('click', function(){
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
-            $(appStoreLogo).on("touchstart", function (event) {
-                event.preventDefault();
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8";
+            $(banner).on('touchstart', function(){
+                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
             if (Utility.isMobile.any()) {
                 banner.style.width = window.innerWidth + "px";
-                banner.style.height = "210px";
+                banner.style.height = "180px";
 
                 logo.width *= 1.7;
                 logo.height *= 1.7;
                 logo.style.marginTop = "17px";
                 logo.style.marginLeft = "17px";
                 logo.style.marginRight = "17px";
-
+                logo.style.float = 'right';
                 text.style.width = "50%";
+                text.style.marginTop = '10px';
+                text.style.marginLeft = '25px';
+                //text.style.fontSize = "2em";
                 spanOne.style.fontSize = "2.5em";
                 spanTwo.style.fontSize = "2em";
 
@@ -1397,10 +1440,13 @@ var BannerTwo = (function () {
             text.appendChild(spanOne);
             text.appendChild(document.createElement("br"));
             text.appendChild(document.createElement("br"));
+
             text.appendChild(spanTwo);
-            banner.appendChild(logo);
-            banner.appendChild(text);
+
             banner.appendChild(appStoreLogo);
+            banner.appendChild(text);
+            banner.appendChild(logo);
+
         }
     };
 
@@ -1489,14 +1535,15 @@ var shareSection = (function () {
             popCon.appendChild(ul);
             popUp.appendChild(popCon);
 
-            if (Utility.isMobile.any()) {
-                this.shareBanner.style.width = window.innerWidth * 0.9 + "px";
-                this.shareBanner.style.height = "170px";
-                this.shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
-                this.shareBanner.style.marginTop = "52%";
-                //tickButton.style.marginTop = "65px";
-                //tickButton.style.marginLeft = "55px";
-            }
+
+            //if (Utility.isMobile.any()) {
+            //    this.shareBanner.style.width = window.innerWidth * 0.9 + "px";
+            //    this.shareBanner.style.height = "170px";
+            //    this.shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
+            //    this.shareBanner.style.marginTop = "52%";
+            //    //tickButton.style.marginTop = "65px";
+            //    //tickButton.style.marginLeft = "55px";
+            //}
 
             //document.body.appendChild(this.shareBanner);
             document.body.appendChild(popUp);

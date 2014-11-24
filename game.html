@@ -24,9 +24,37 @@
         if (window.location.hash && window.location.hash.substring(1) !== null) {
             window.location = window.location.href.split("#")[0] + '' + window.location.hash.substring(1);
         }
+        // somewhere from FB or anywhere possible passing in first name
+        Config.setContextName("Ryne");
+
+        //call from client
+        Assets.initialise({
+            full_background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png",
+            background: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png",
+            goal_post: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalpost.png",
+            goalkeeper: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper.png",
+            ball: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-ball.png",
+            fhLogo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
+            fhLogoTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-fh-logo-only.png",
+            uncheck: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png",
+            check: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png",
+            availableOnAppStore: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
+            availableOnAppStoreTwo: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dlOnAppStore.png",
+            getOnGooglePlay: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
+            getOnGooglePlay2: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playStore.png",
+            share_fb: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png",
+            share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png",
+            play_now_button: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png"
+        }, function () {
+            //completion callback
+            StartScene.init();
+            Banner.setUpContent(document.getElementById("banner"));
+            BannerTwo.setUpContent(document.getElementById("bannerTwo"));
+        });
     </script>
+
     <!--<a href="#0" class="cd-popup-trigger">View Pop-up</a>-->
-    <p id="content">Help Ryne to win an iPhone 6</p>
+    <!--<p id="content">Help Ryne to win an iPhone 6</p>-->
     <!--<div class="cd-popup" role="alert">-->
         <!--<div class="cd-popup-container">-->
             <!--<p>Are you sure you want to delete this element?</p>-->
