@@ -130,11 +130,12 @@ xpopup
     -webkit-transition-duration: 0.3s;
     -moz-transition-duration: 0.3s;
     transition-duration: 0.3s;
+    font-size: 2em;
 }
 
 .cd-popup-container p {
     font-family: 'Roboto', sans-serif;
-    font-size: 3em;
+    /*font-size: 3em;*/
     line-height: 60px;
     padding: 3em 1em;
 }
@@ -153,7 +154,7 @@ xpopup
 .cd-popup-container .cd-buttons a {
     display: block;
     height: 120px;
-    font-size: 3em;
+    /*font-size: 3em;*/
     font-family: 'Roboto', sans-serif;
     line-height: 60px;
     text-transform: uppercase;
@@ -230,6 +231,6 @@ xpopup
 
 @media only screen and (min-width: 1170px) {
     .cd-popup-container {
-        margin: 8em auto;
+        margin: 4em auto;
     }
 }

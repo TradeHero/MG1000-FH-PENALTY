@@ -1027,7 +1027,6 @@ var StartScene = (function () {
                 ScoreCanvas.getCanvas().style.display = "block";
 
                 if (shareSection.getIsChecked()) {
-                    //TODO: hardcoded url need to change
                     atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
@@ -1462,25 +1461,6 @@ var shareSection = (function () {
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                 }
             }, "touch");
-            //this.shareBanner = document.createElement("div");
-            //this.shareBanner.id = "shareBanner";
-            //this.shareBanner.style.width = (760 * 0.9) + "px";
-            //this.shareBanner.style.height = "130px";
-            //this.shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
-            //this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-            //this.shareBanner.style.backgroundSize = (760 * 0.9) +"px 130px";
-            //this.shareBanner.style.marginTop = "30%";
-
-            //var tickButton = document.createElement("button");
-            //tickButton.id = "tickButton";
-            //tickButton.style.width = "60px";
-            //tickButton.style.height = "60px";
-            //tickButton.style.marginTop = "38px";
-            //tickButton.style.marginLeft = "32px";
-            ////tickButton.setAttribute('href', '#0');
-            //tickButton.className = "cd-popup-trigger";
-            //tickButton.style.backgroundColor = "rgba(0,0,0,0)";
-            //tickButton.style.border = "0";
 
             var popUp = document.createElement("div");
             popUp.className = "cd-popup";
@@ -1488,7 +1468,6 @@ var shareSection = (function () {
             popUp.style.zIndex = "5";
             var popCon = document.createElement("div");
             popCon.className = "cd-popup-container";
-            //var containerWidth =
             popCon.style.width = Config.isMobile() ? '90%' : '40%';
             var msg = document.createElement("p");
             msg.innerHTML = "Are you sure you don't want to win an iPhone 6?!";
