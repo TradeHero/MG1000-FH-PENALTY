@@ -262,13 +262,34 @@ var ScoreCanvas = (function () {
             //ctx.fillColor = 'rgb(29, 173, 241)';
             //ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+            var engagingText = document.createElement('p');
+            engagingText.id = "engaging";
+            engagingText.innerHTML = "Score goals to win an iPhone!";
+            engagingText.style.fontSize = Config.isMobile() ? '3em' : '2.5em';
+            engagingText.style.lineHeight = Config.isMobile() ? '3em' : '2em';
+            engagingText.style.color = 'white';
+            engagingText.style.fontWeight = '700';
+            var engagingSuppText = document.createElement('p');
+            engagingSuppText.id = "engagingSupp";
+            engagingSuppText.innerHTML = "Most goals by Christmas, wins!";
+            engagingSuppText.style.fontSize = Config.isMobile() ? '2em' : '1.5em';
+            //engagingSuppText.style.lineHeight = Config.isMobile() ? '1.5em' : '1.5em';
+            engagingSuppText.style.color = 'white';
+            engagingSuppText.style.fontWeight = '700';
+
 
             var bluediv = document.createElement('div');
             bluediv.id = 'bluediv';
-            bluediv.style.backgroundColor = 'rgb(29, 173, 241)';
+            bluediv.style.backgroundImage = !Config.isMobile()
+                ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-score-760x119.png\')'
+                : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-score-980x202.png\')';
+            bluediv.style.backgroundSize = 'cover';
             bluediv.style.width = canvasWidth + "px";
             bluediv.style.height = (canvasHeight + 1) + "px";
             bluediv.style.borderColor = 'transparent';
+
+            bluediv.appendChild(engagingText);
+            bluediv.appendChild(engagingSuppText);
 
             //add action to blue div
 
@@ -1081,6 +1102,7 @@ var ResultScene = (function () {
             var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " goals for " + Config.getContextName() + "!");
             resultLabel.font_size = "2";
             resultLabel.text_color = "white";
+            resultLabel.font_weight = "700";
 
             switch (score) {
                 case 0:
@@ -1117,10 +1139,10 @@ var ResultScene = (function () {
 
 
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
-            var shareButtonWidth = canvasWidth * 0.8;
+            var shareButtonWidth = canvasWidth * 0.6;
             var shareButtonHeight = shareButtonWidth / shareButtonRatio;
             var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
-            var shareButtonY = canvasHeight * 0.88 - shareButtonHeight / 2;
+            var shareButtonY = canvasHeight * 0.75 - shareButtonHeight / 2;
             var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
             shareButton.image = Assets.images().share_fb;
             shareButton.label.text = "";
