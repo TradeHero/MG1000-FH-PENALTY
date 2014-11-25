@@ -94,6 +94,7 @@ var Application = (function () {
             this.canvas.width = this.width;
             this.canvas.height = this.height;
             this.canvas.id = "mainCanvas";
+            this.canvas.style.cursor = "pointer";
             this.ctx = this.canvas.getContext("2d");
 
             var body = document.getElementById('absolcenter');
