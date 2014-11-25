@@ -1,13 +1,21 @@
 @import url(http://fonts.googleapis.com/css?family=Roboto:400italic,700,400);
 
 body {
-    /*background-color: rgb(29, 173, 241);*/
-background-color: rgb(111, 111, 111);
+    background-color: rgb(111, 111, 111);
 }
 
 b {
     font-weight: 700;
     font-size: 1.55em;
+}
+
+#absolcenter {
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
 }
 
 canvas {
@@ -34,7 +42,7 @@ canvas {
     text-align: center;
 }
 
-#banner, #bannerTwo, #bluediv{
+#banner, #bannerTwo, #bluediv {
     background-color: black;
     width: 760px;
     height: 100px;
@@ -57,7 +65,7 @@ canvas {
     z-index: 2;
 }
 
-#bannerText, #bannerTextTwo{
+#bannerText, #bannerTextTwo {
     font-family: 'Roboto', sans-serif;
     height: 100%;
     color: white;
@@ -66,7 +74,7 @@ canvas {
     display: inline-block;
 }
 
-#smallLogo, #smallLogoTwo{
+#smallLogo, #smallLogoTwo {
     margin-left: 50px;
 }
 

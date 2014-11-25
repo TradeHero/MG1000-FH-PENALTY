@@ -37,11 +37,11 @@ var Config = (function () {
         setHostURI: function(URI){
             _hostURI = URI
         },
-        isMobile: function () {
-            return Utility.isMobile.any();
-        },
         getHostURI: function(){
             return _hostURI;
+        },
+        isMobile: function () {
+            return Utility.isMobile.any();
         }
     }
 
@@ -83,7 +83,8 @@ var Application = (function () {
             this.canvas.id = "mainCanvas";
             this.ctx = this.canvas.getContext("2d");
 
-            var body = document.body;
+            var body = document.getElementById('absolcenter');
+            body.style.height = Config.isMobile() ? '1200px' : '900px';
             body.appendChild(this.canvas);
 
             var startTouchX = 0;
@@ -259,7 +260,7 @@ var ScoreCanvas = (function () {
 
 
 
-            var body = document.body;
+            var body = document.getElementById('absolcenter');
             body.appendChild(this.canvas);
             body.appendChild(bluediv);
 
@@ -1004,7 +1005,7 @@ var StartScene = (function () {
             }
 
             this.startButton.addTarget(function () {
-                document.body.removeChild(document.getElementById("bluediv"));
+                document.getElementById('absolcenter').removeChild(document.getElementById("bluediv"));
                 ScoreCanvas.getCanvas().style.display = "block";
 
                 if (shareSection.getIsChecked()) {
@@ -1332,7 +1333,7 @@ var Banner = (function () {
             banner.style.height = "100px";
             banner.style.backgroundColor = "rgb(64,64,64)";
 
-            document.body.appendChild(banner);
+            document.getElementById('absolcenter').appendChild(banner);
         },
 
         setUpContent: function (banner) {
@@ -1384,7 +1385,7 @@ var BannerTwo = (function () {
             banner.style.height = "100px";
             banner.style.backgroundColor = "rgb(64,64,64)";
 
-            document.body.appendChild(banner);
+            document.getElementById('absolcenter').appendChild(banner);
         },
 
         setUpContent: function (banner) {
@@ -1514,8 +1515,8 @@ var shareSection = (function () {
             //    //tickButton.style.marginLeft = "55px";
             //}
 
-            //document.body.appendChild(this.shareBanner);
-            document.body.appendChild(popUp);
+            //document.getElementById('absolcenter').appendChild(this.shareBanner);
+            document.getElementById('absolcenter').appendChild(popUp);
             //this.shareBanner.appendChild(tickButton);
             mainWindow.addSubview(this.shareBanner);
             mainWindow.addSubview(shareBannerImage);
