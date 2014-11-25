@@ -47,6 +47,19 @@ var Config = (function () {
 
 })();
 
+var URLConfig = (function () {
+    var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?access_token=";
+    var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?access_token=";
+    return {
+        getShareToFBApi: function () {
+            return Config.getHostURI() + _shareToFB;
+        },
+        getRecordPointsApi: function () {
+            return Config.getHostURI() + _recordPoints;
+        }
+    }
+})();
+
 function inherit(proto) {
     function F() {
     }
@@ -1010,7 +1023,7 @@ var StartScene = (function () {
 
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
-                    atomic.get(Config.getHostURI() + 'api/games/fhpenalty/FacebookShare?access_token='+getURLParameter("access_token"))
+                    atomic.get(URLConfig.getShareToFBApi() +getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1060,18 +1073,18 @@ var ResultScene = (function () {
             var resultLabelY = canvasHeight * 0.1;
             // TODO: post owner username
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
-            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " goals for Ryne!");
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " goals for " + Config.getContextName() + "!");
             resultLabel.font_size = "2";
             resultLabel.text_color = "white";
 
             switch (score) {
                 case 0:
-                    resultLabel.text = "Oops! You have scored no goals for Ryne.";
+                    resultLabel.text = "Oops! You have scored no goals for " + Config.getContextName() + ".";
                     resultLabel.text_color = "#efefef";
                     break;
 
                 case 1:
-                    resultLabel.text = "You have scored a goal for Ryne!";
+                    resultLabel.text = "You have scored a goal for " + Config.getContextName() + "!";
                     break;
 
                 default:
@@ -1108,15 +1121,13 @@ var ResultScene = (function () {
             shareButton.image = Assets.images().share_fb;
             shareButton.label.text = "";
 
-            if (!shareSection.getIsChecked()) {
-                shareButton.addTarget(function (sender) {
-                    sender.enabled = false;
-                    sender.enabled = false;
-                    sender.image = Assets.images().share_fb_succeed;
-                    sender.drawView(Application.getCanvasCtx());
+            shareButton.addTarget(function (sender) {
+                sender.enabled = false;
+                sender.image = Assets.images().share_fb_succeed;
+                sender.drawView(Application.getCanvasCtx());
 
-                    //TODO: hardcoded url need to change
-                    atomic.get(Config.getHostURI() + 'api/games/fhpenalty/FacebookShare?access_token=' + getURLParameter("access_token"))
+                if (!shareSection.getIsChecked()) {
+                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             sender.enabled = false;
                             sender.image = Assets.images().share_fb_succeed;
@@ -1125,8 +1136,8 @@ var ResultScene = (function () {
                         .error(function (data, xhr) {
                             console.log("error?");
                         });
-                }, "touch");
-            }
+                }
+            }, "touch");
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
@@ -1138,8 +1149,7 @@ var ResultScene = (function () {
                 }
             }
 
-            //TODO: hardcoded url need to change
-            atomic.get(Config.getHostURI() + 'api/games/fhpenalty/RecordEggPoints?access_token=' + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+            atomic.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
@@ -1148,11 +1158,7 @@ var ResultScene = (function () {
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(resultLabel);
             this.mainWindow.addSubview(dlSectionButton);
-
-            if (shareSection.getIsChecked()) {
-                this.mainWindow.addSubview(shareButton);
-            }
-
+            this.mainWindow.addSubview(shareButton);
         }
     };
 
