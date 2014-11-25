@@ -105,13 +105,13 @@ var Application = (function () {
             var startTime = 0;
 
             // listen for clicks
-            window.addEventListener('click', function (e) {
+            this.canvas.addEventListener('click', function (e) {
                 e.preventDefault();
                 Input.trigger(e);
             }, false);
 
             // listen for touches
-            window.addEventListener('touchstart', function (e) {
+            this.canvas.addEventListener('touchstart', function (e) {
                 e.preventDefault();
                 // first touch from the event
                 Input.trigger(e.touches[0]);
@@ -122,11 +122,11 @@ var Application = (function () {
                     startTime = Date.now();
                 }
             }, false);
-            window.addEventListener('touchmove', function (e) {
+            this.canvas.addEventListener('touchmove', function (e) {
                 // disable zoom and scroll
                 e.preventDefault();
             }, false);
-            window.addEventListener('touchend', function (e) {
+            this.canvas.addEventListener('touchend', function (e) {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.changedTouches[0].pageX || startTouchY !== e.changedTouches[0].pageY) {
@@ -138,7 +138,7 @@ var Application = (function () {
 
             }, false);
 
-            window.addEventListener('mousedown', function (e) {
+            this.canvas.addEventListener('mousedown', function (e) {
                 e.preventDefault();
                 // first touch from the event
                 //INPUT.trigger(e.touches[0]);
@@ -150,7 +150,7 @@ var Application = (function () {
                 }
             }, false);
 
-            window.addEventListener('mouseup', function (e) {
+            this.canvas.addEventListener('mouseup', function (e) {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
@@ -612,7 +612,13 @@ var GameObjects = (function () {
             var dy = this.getDragEndY() - this.getDragStartY();
             var distance = Math.sqrt(dx * dx + dy * dy);
 
-            return distance / this.getDragDuration();
+            var velocity = distance / this.getDragDuration();
+
+            if (velocity < 0.8) {
+                velocity = 0.8;
+            }
+
+            return velocity;
         },
 
         resetBall: function () {
@@ -1021,7 +1027,6 @@ var StartScene = (function () {
                 ScoreCanvas.getCanvas().style.display = "block";
 
                 if (shareSection.getIsChecked()) {
-                    //TODO: hardcoded url need to change
                     atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
@@ -1251,7 +1256,7 @@ var Game = (function () {
             }
 
             // out of bound - miss shot
-            else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
+            else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth() || GameObjects.getBallCurrentY() >= Application.getCanvasHeight()) {
                 this.showMissShot();
             }
 
@@ -1456,25 +1461,6 @@ var shareSection = (function () {
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
                 }
             }, "touch");
-            //this.shareBanner = document.createElement("div");
-            //this.shareBanner.id = "shareBanner";
-            //this.shareBanner.style.width = (760 * 0.9) + "px";
-            //this.shareBanner.style.height = "130px";
-            //this.shareBanner.style.backgroundColor = "rgba(0,0,0,0)";
-            //this.shareBanner.style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-            //this.shareBanner.style.backgroundSize = (760 * 0.9) +"px 130px";
-            //this.shareBanner.style.marginTop = "30%";
-
-            //var tickButton = document.createElement("button");
-            //tickButton.id = "tickButton";
-            //tickButton.style.width = "60px";
-            //tickButton.style.height = "60px";
-            //tickButton.style.marginTop = "38px";
-            //tickButton.style.marginLeft = "32px";
-            ////tickButton.setAttribute('href', '#0');
-            //tickButton.className = "cd-popup-trigger";
-            //tickButton.style.backgroundColor = "rgba(0,0,0,0)";
-            //tickButton.style.border = "0";
 
             var popUp = document.createElement("div");
             popUp.className = "cd-popup";
@@ -1482,7 +1468,6 @@ var shareSection = (function () {
             popUp.style.zIndex = "5";
             var popCon = document.createElement("div");
             popCon.className = "cd-popup-container";
-            //var containerWidth =
             popCon.style.width = Config.isMobile() ? '90%' : '40%';
             var msg = document.createElement("p");
             msg.innerHTML = "Are you sure you don't want to win an iPhone 6?!";
