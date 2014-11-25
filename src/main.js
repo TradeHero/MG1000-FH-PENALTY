@@ -1573,7 +1573,7 @@ var shareSection = (function () {
                     }
                 });
 
-                $(yestemporaryDiv).on('click', function (event) {
+                $(notemporaryDiv).on('click', function (event) {
                     event.preventDefault();
                     $('.cd-popup').removeClass('is-visible');
                     setTimeout(function () {
@@ -1589,7 +1589,7 @@ var shareSection = (function () {
                     }, 100);
                 });
 
-                $(yesContent).on('click', function (event) {
+                $(yestemporaryDiv).on('click', function (event) {
                     //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.getShareBanner().image = Assets.images().uncheck;
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
@@ -1601,7 +1601,7 @@ var shareSection = (function () {
                     }, 100);
                 });
 
-                $(yesContent).on('touchstart', function (event) {
+                $(yestemporaryDiv).on('touchstart', function (event) {
                     //shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Uncheck.png')";
                     shareSection.getShareBanner().image = Assets.images().uncheck;
                     shareSection.getShareBanner().drawView(Application.getCanvasCtx());
