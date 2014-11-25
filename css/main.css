@@ -9,6 +9,10 @@ b {
     font-size: 1.55em;
 }
 
+p#engaging , p#engagingSupp{
+    text-align: center;
+}
+
 #absolcenter {
     /*margin: auto;*/
     /*position: absolute;*/
