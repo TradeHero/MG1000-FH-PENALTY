@@ -25,6 +25,7 @@ var Config = (function () {
 
     var _contextName = null;
     var _hostURI = null;
+    var _eggId = null;
 
     // public interface
     return {
@@ -40,6 +41,12 @@ var Config = (function () {
         getHostURI: function () {
             return _hostURI;
         },
+        setEggId: function (eggId) {
+            _eggId = eggId;
+        },
+        getEggId: function () {
+            return _eggId;
+        },
         isMobile: function () {
             return Utility.isMobile.any();
         }
@@ -50,12 +57,16 @@ var Config = (function () {
 var URLConfig = (function () {
     var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?access_token=";
     var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?access_token=";
+    var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?eggId=";
     return {
         getShareToFBApi: function () {
             return Config.getHostURI() + _shareToFB;
         },
         getRecordPointsApi: function () {
             return Config.getHostURI() + _recordPoints;
+        },
+        getRecordDownload: function () {
+            return Config.getHostURI() + _recordDownload+Config.getEggId()+"&access_token=";
         }
     }
 })();
@@ -1105,12 +1116,26 @@ var ResultScene = (function () {
             dlSectionButton.image = Assets.images().ios_dl_section;
             dlSectionButton.label.text = "";
             dlSectionButton.addTarget(function (sender) {
+                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             }, "touch");
 
             if (Utility.isMobile.Android()) {
                 dlSectionButton.image = Assets.images().android_dl_section;
                 dlSectionButton.addTarget(function (sender) {
+                    atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                        .success(function (data, xhr) {
+                            console.log("success");
+                        })
+                        .error(function (data, xhr) {
+                            console.log("error?");
+                        });
                     window.location.href = "https://play.google.com/store/apps/details?id=com.myhero.fh";
                 }, "touch");
             }
@@ -1354,12 +1379,28 @@ var Banner = (function () {
             //
 
             $(banner).on('click', function () {
+                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
                 window.location.href = !Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
                     : "https://play.google.com/store/apps/details?id=com.myhero.fh";
             });
 
             $(banner).on('touchstart', function () {
+                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
                 window.location.href = !Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
                     : "https://play.google.com/store/apps/details?id=com.myhero.fh";
@@ -1404,10 +1445,24 @@ var BannerTwo = (function () {
                 : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-apple.png\')';
 
             $(banner).on('click', function () {
+                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
             $(banner).on('touchstart', function () {
+                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
