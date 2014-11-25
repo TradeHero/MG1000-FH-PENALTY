@@ -105,13 +105,13 @@ var Application = (function () {
             var startTime = 0;
 
             // listen for clicks
-            window.addEventListener('click', function (e) {
+            this.canvas.addEventListener('click', function (e) {
                 e.preventDefault();
                 Input.trigger(e);
             }, false);
 
             // listen for touches
-            window.addEventListener('touchstart', function (e) {
+            this.canvas.addEventListener('touchstart', function (e) {
                 e.preventDefault();
                 // first touch from the event
                 Input.trigger(e.touches[0]);
@@ -122,11 +122,11 @@ var Application = (function () {
                     startTime = Date.now();
                 }
             }, false);
-            window.addEventListener('touchmove', function (e) {
+            this.canvas.addEventListener('touchmove', function (e) {
                 // disable zoom and scroll
                 e.preventDefault();
             }, false);
-            window.addEventListener('touchend', function (e) {
+            this.canvas.addEventListener('touchend', function (e) {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.changedTouches[0].pageX || startTouchY !== e.changedTouches[0].pageY) {
@@ -138,7 +138,7 @@ var Application = (function () {
 
             }, false);
 
-            window.addEventListener('mousedown', function (e) {
+            this.canvas.addEventListener('mousedown', function (e) {
                 e.preventDefault();
                 // first touch from the event
                 //INPUT.trigger(e.touches[0]);
@@ -150,7 +150,7 @@ var Application = (function () {
                 }
             }, false);
 
-            window.addEventListener('mouseup', function (e) {
+            this.canvas.addEventListener('mouseup', function (e) {
                 // as above
                 e.preventDefault();
                 if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
@@ -612,7 +612,13 @@ var GameObjects = (function () {
             var dy = this.getDragEndY() - this.getDragStartY();
             var distance = Math.sqrt(dx * dx + dy * dy);
 
-            return distance / this.getDragDuration();
+            var velocity = distance / this.getDragDuration();
+
+            if (velocity < 0.8) {
+                velocity = 0.8;
+            }
+
+            return velocity;
         },
 
         resetBall: function () {
@@ -1251,7 +1257,7 @@ var Game = (function () {
             }
 
             // out of bound - miss shot
-            else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth()) {
+            else if (GameObjects.getBallCurrentX() <= 0 || GameObjects.getBallCurrentX() >= Application.getCanvasWidth() || GameObjects.getBallCurrentY() >= Application.getCanvasHeight()) {
                 this.showMissShot();
             }
 
