@@ -34,10 +34,10 @@ var Config = (function () {
         getContextName: function () {
             return _contextName;
         },
-        setHostURI: function(URI){
+        setHostURI: function (URI) {
             _hostURI = URI
         },
-        getHostURI: function(){
+        getHostURI: function () {
             return _hostURI;
         },
         isMobile: function () {
@@ -272,7 +272,6 @@ var ScoreCanvas = (function () {
             //add action to blue div
 
 
-
             var body = document.getElementById('absolcenter');
             body.appendChild(this.canvas);
             body.appendChild(bluediv);
@@ -375,7 +374,7 @@ var Renderer = (function () {
                 var tutorialLabel = new UI.Label(Application.getCanvasWidth() / 2, GameObjects.getBallStartY() - GameObjects.getBallHeight(), Application.getCanvasWidth(), 80, "Swipe the ball to shoot!");
                 tutorialLabel.text_color = "white";
                 tutorialLabel.font_weight = '700';
-                tutorialLabel.y = tutorialLabel.y +10;
+                tutorialLabel.y = tutorialLabel.y + 10;
                 tutorialLabel.font_size = Config.isMobile() ? '4.5' : '3';
                 this.mainWindow.addSubview(tutorialLabel);
 
@@ -1023,7 +1022,7 @@ var StartScene = (function () {
 
                 if (shareSection.getIsChecked()) {
                     //TODO: hardcoded url need to change
-                    atomic.get(URLConfig.getShareToFBApi() +getURLParameter("access_token"))
+                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1109,7 +1108,6 @@ var ResultScene = (function () {
                     window.location.href = "https://play.google.com/store/apps/details?id=com.myhero.fh";
                 }, "touch");
             }
-
 
 
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
@@ -1351,14 +1349,14 @@ var Banner = (function () {
 
             $(banner).on('click', function () {
                 window.location.href = !Utility.isMobile.Android()
-                ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                :"https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
             });
 
             $(banner).on('touchstart', function () {
                 window.location.href = !Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                    :"https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
             });
 
             if (Utility.isMobile.any()) {
