@@ -1340,14 +1340,18 @@ var Banner = (function () {
             banner.style.background = Utility.isMobile.Android()
                 ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-google.png\')'
                 : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-apple.png\')';
-
+            //
 
             $(banner).on('click', function () {
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.location.href = !Utility.isMobile.Android()
+                ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
+                :"https://play.google.com/store/apps/details?id=com.myhero.fh";
             });
 
             $(banner).on('touchstart', function () {
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.location.href = !Utility.isMobile.Android()
+                    ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
+                    :"https://play.google.com/store/apps/details?id=com.myhero.fh";
             });
 
             if (Utility.isMobile.any()) {
@@ -1431,10 +1435,13 @@ var shareSection = (function () {
             var shareBannerX = canvasWidth / 2 - shareBannerWidth / 2;
             var shareBannerY = canvasHeight * 0.7;
 
+            var shareBannerImage = new UI.Button(shareBannerX + shareBannerWidth * 0.03, shareBannerY + shareBannerHeight / 2 - shareBannerWidth / 16, shareBannerWidth / 8, shareBannerWidth / 8);
+            shareBannerImage.label.text = "";
+            shareBannerImage.alpha = 0;
             this.shareBanner = new UI.Button(shareBannerX, shareBannerY, shareBannerWidth, shareBannerHeight);
             this.shareBanner.image = Assets.images().check;
             this.shareBanner.label.text = "";
-            this.shareBanner.addTarget(function (sender) {
+            shareBannerImage.addTarget(function (sender) {
                 if (shareSection.getIsChecked()) {
                     $('.cd-popup').addClass('is-visible');
                     StartScene.getStartButton().enabled = false;
@@ -1511,6 +1518,7 @@ var shareSection = (function () {
             document.body.appendChild(popUp);
             //this.shareBanner.appendChild(tickButton);
             mainWindow.addSubview(this.shareBanner);
+            mainWindow.addSubview(shareBannerImage);
 
             jQuery(document).ready(function ($) {
                 //open popup
