@@ -58,6 +58,7 @@ var URLConfig = (function () {
     var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?access_token=";
     var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?access_token=";
     var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?eggId=";
+    var _postEggResultToFB = "api/PenaltyKick/fhpenalty/PostEggResultToFB?access_token=";
     return {
         getShareToFBApi: function () {
             return Config.getHostURI() + _shareToFB;
@@ -67,6 +68,9 @@ var URLConfig = (function () {
         },
         getRecordDownload: function () {
             return Config.getHostURI() + _recordDownload+Config.getEggId()+"&access_token=";
+        },
+        getPostEggResultToFB: function () {
+            return Config.getHostURI() + _postEggResultToFB;
         }
     }
 })();
@@ -178,12 +182,10 @@ var Application = (function () {
         },
 
         getCanvasWidth: function () {
-            //return window.innerWidth;
             return this.width;
         },
 
         getCanvasHeight: function () {
-            //return window.innerHeight * GAME_RATIO;
             return this.height;
         },
 
@@ -258,20 +260,13 @@ var ScoreCanvas = (function () {
         canvas: undefined,
         ctx: undefined,
         init: function () {
-
-            //var canvasWidth = window.innerWidth;
             var canvasWidth = width;
-            //var canvasHeight = canvasWidth * GAME_RATIO;
             var canvasHeight = height;
             this.canvas = document.createElement("canvas");
             this.canvas.width = canvasWidth;
             this.canvas.height = canvasHeight;
             this.ctx = this.canvas.getContext("2d");
-            //this.canvas.alpha = 0;
-            //this.canvas.style.visibility = "hidden";
             this.canvas.style.display = "none";
-            //ctx.fillColor = 'rgb(29, 173, 241)';
-            //ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
             var engagingText = document.createElement('p');
             engagingText.id = "engaging";
@@ -288,7 +283,6 @@ var ScoreCanvas = (function () {
             engagingSuppText.style.color = 'white';
             engagingSuppText.style.fontWeight = '700';
 
-
             var bluediv = document.createElement('div');
             bluediv.id = 'bluediv';
             bluediv.style.backgroundImage = !Config.isMobile()
@@ -302,23 +296,16 @@ var ScoreCanvas = (function () {
             bluediv.appendChild(engagingText);
             bluediv.appendChild(engagingSuppText);
 
-            //add action to blue div
-
-
             var body = document.getElementById('absolcenter');
             body.appendChild(this.canvas);
             body.appendChild(bluediv);
-
-            //$('bluediv').addEvent()
         },
 
         getCanvasWidth: function () {
-            //return window.innerWidth;
             return width;
         },
 
         getCanvasHeight: function () {
-            //return window.innerHeight * GAME_RATIO;
             return height;
         },
 
@@ -1042,19 +1029,8 @@ var StartScene = (function () {
 
             this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
             this.startButton.cornerRadius = 35;
-            //this.startButton.label.x = startButtonX + startButtonWidth * 0.58;
-            //this.startButton.label.y = startButtonY + startButtonHeight * 0.6;
-            //this.startButton.label.text = "Help " + Config.getContextName() + " win his iPhone 6...";
             this.startButton.label.text = "";
-            //this.startButton.label.font_size = "2";
-            //this.startButton.label.lineHeight = "35px";
-            //this.startButton.label.text_color = "white";
             this.startButton.image = Assets.images().play_now_button;
-
-            if (Utility.isMobile.any()) {
-                //goLabel.x = startButtonX + startButtonWidth * 0.25;
-            }
-
             this.startButton.addTarget(function () {
                 document.getElementById('absolcenter').removeChild(document.getElementById("bluediv"));
                 ScoreCanvas.getCanvas().style.display = "block";
@@ -1199,6 +1175,12 @@ var ResultScene = (function () {
                     resultLabel.y = canvasHeight * 0.1;
                 }
             }
+
+            atomic.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+                .success(function (data, xhr) {
+                })
+                .error(function (data, xhr) {
+                });
 
             atomic.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
                 .success(function (data, xhr) {
@@ -1409,6 +1391,14 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
                 window.location.href = !Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
                     : "https://play.google.com/store/apps/details?id=com.myhero.fh";
@@ -1416,6 +1406,14 @@ var Banner = (function () {
 
             $(banner).on('touchstart', function () {
                 atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1474,6 +1472,15 @@ var BannerTwo = (function () {
                     .error(function (data, xhr) {
                         console.log("error?");
                     });
+
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
@@ -1485,6 +1492,15 @@ var BannerTwo = (function () {
                     .error(function (data, xhr) {
                         console.log("error?");
                     });
+
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                    .success(function (data, xhr) {
+                        console.log("success");
+                    })
+                    .error(function (data, xhr) {
+                        console.log("error?");
+                    });
+
                 window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
             });
 
@@ -1572,48 +1588,11 @@ var shareSection = (function () {
             popCon.appendChild(ul);
             popUp.appendChild(popCon);
 
-
-            //if (Utility.isMobile.any()) {
-            //    this.shareBanner.style.width = window.innerWidth * 0.9 + "px";
-            //    this.shareBanner.style.height = "170px";
-            //    this.shareBanner.style.backgroundSize = window.innerWidth * 0.9 +"px 170px";
-            //    this.shareBanner.style.marginTop = "52%";
-            //    //tickButton.style.marginTop = "65px";
-            //    //tickButton.style.marginLeft = "55px";
-            //}
-
-            //document.getElementById('absolcenter').appendChild(this.shareBanner);
             document.getElementById('absolcenter').appendChild(popUp);
-            //this.shareBanner.appendChild(tickButton);
             mainWindow.addSubview(this.shareBanner);
             mainWindow.addSubview(shareBannerImage);
 
             jQuery(document).ready(function ($) {
-                //open popup
-                //$('.cd-popup-trigger').on('click', function (event) {
-                //    event.preventDefault();
-                //    if (shareSection.getIsChecked()) {
-                //        $('.cd-popup').addClass('is-visible');
-                //        StartScene.getStartButton().enabled = false;
-                //        console.log(StartScene.getStartButton());
-                //    } else {
-                //        shareSection.setIsChecked(true);
-                //        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-                //    }
-                //});
-                //
-                //$('.cd-popup-trigger').on('touchstart', function (event) {
-                //    event.preventDefault();
-                //    if (shareSection.getIsChecked()) {
-                //        $('.cd-popup').addClass('is-visible');
-                //        StartScene.getStartButton().enabled = false;
-                //        console.log(StartScene.getStartButton());
-                //    } else {
-                //        shareSection.setIsChecked(true);
-                //        shareSection.getShareBanner().style.backgroundImage = "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/Checked.png')";
-                //    }
-                //});
-
                 //close popup
                 $('.cd-popup').on('click', function (event) {
                     if ($(event.target).is('.cd-popup-close') || $(event.target).is('.cd-popup')) {
