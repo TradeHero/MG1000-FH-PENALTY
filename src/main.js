@@ -41,12 +41,6 @@ var Config = (function () {
         getHostURI: function () {
             return _hostURI;
         },
-        setEggId: function (eggId) {
-            _eggId = eggId;
-        },
-        getEggId: function () {
-            return _eggId;
-        },
         isMobile: function () {
             return Utility.isMobile.any();
         }
@@ -67,7 +61,7 @@ var URLConfig = (function () {
             return Config.getHostURI() + _recordPoints;
         },
         getRecordDownload: function () {
-            return Config.getHostURI() + _recordDownload+Config.getEggId()+"&access_token=";
+            return Config.getHostURI() + _recordDownload+getURLParameter("eggId")+"&access_token=";
         },
         getPostEggResultToFB: function () {
             return Config.getHostURI() + _postEggResultToFB;
@@ -410,6 +404,7 @@ var Renderer = (function () {
             var goalText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "GOAL!!");
             goalText.font_size = "5";
             goalText.text_color = "green";
+            goalText.font_weight = "700";
             this.mainWindow.addSubview(goalText);
         },
 
@@ -417,6 +412,7 @@ var Renderer = (function () {
             var missText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "MISS!!");
             missText.font_size = "5";
             missText.text_color = "red";
+            missText.font_weight = "700";
             this.mainWindow.addSubview(missText);
         },
 
@@ -1190,8 +1186,14 @@ var ResultScene = (function () {
 
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(resultLabel);
-            this.mainWindow.addSubview(dlSectionButton);
-            this.mainWindow.addSubview(shareButton);
+
+
+            if (!shareSection.getIsChecked()) {
+                this.mainWindow.addSubview(shareButton);
+            } else {
+                dlSectionButton.y = shareButtonY;
+                this.mainWindow.addSubview(dlSectionButton);
+            }
         }
     };
 
@@ -1209,6 +1211,7 @@ var Game = (function () {
         currentTime: 0,
         lastTime: 0,
         keeperDirection: 1,
+        keeperTimer: 0,
         resultTimer: 0,
         kickLabelTimer: 0,
         kickLabelAlpha: 0,
@@ -1244,14 +1247,27 @@ var Game = (function () {
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
             }
 
-            if (GameObjects.getKeeperX() >= GameObjects.getGuardMaxX()) {
-                this.keeperDirection = 1;
-            } else if (GameObjects.getKeeperX() <= GameObjects.getGuardMinX()) {
-                this.keeperDirection = -1;
-            }
+            //if (GameObjects.getKeeperX() >= GameObjects.getGuardMaxX()) {
+            //    this.keeperDirection = 1;
+            //} else if (GameObjects.getKeeperX() <= GameObjects.getGuardMinX()) {
+            //    this.keeperDirection = -1;
+            //}
 
+            this.keeperTimer += this.delta;
             if (!this.showingResult && GameObjects.getCurrentKick() < 3) {
-                GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
+                //GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
+
+                if (this.keeperTimer > 0.3 && GameObjects.getCurrentKick() === 0) {
+                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
+                    this.keeperTimer = 0;
+                } else if (this.keeperTimer > 0.1 && GameObjects.getCurrentKick() === 1) {
+                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
+                    this.keeperTimer = 0;
+                } else if (this.keeperTimer > 0.05 && GameObjects.getCurrentKick() === 2) {
+                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
+                    this.keeperTimer = 0;
+                }
+
             }
 
             Renderer.renderGoalPostAndKeeper();
