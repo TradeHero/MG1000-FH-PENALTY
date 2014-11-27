@@ -25,7 +25,6 @@ var Config = (function () {
 
     var _contextName = null;
     var _hostURI = null;
-    var _eggId = null;
 
     // public interface
     return {
@@ -51,7 +50,7 @@ var Config = (function () {
 var URLConfig = (function () {
     var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?access_token=";
     var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?access_token=";
-    var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?eggId=";
+    var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?egg=";
     var _postEggResultToFB = "api/PenaltyKick/fhpenalty/PostEggResultToFB?access_token=";
     return {
         getShareToFBApi: function () {
@@ -61,7 +60,7 @@ var URLConfig = (function () {
             return Config.getHostURI() + _recordPoints;
         },
         getRecordDownload: function () {
-            return Config.getHostURI() + _recordDownload+getURLParameter("eggId")+"&access_token=";
+            return Config.getHostURI() + _recordDownload+getURLParameter("egg")+"&access_token=";
         },
         getPostEggResultToFB: function () {
             return Config.getHostURI() + _postEggResultToFB;
@@ -1172,13 +1171,13 @@ var ResultScene = (function () {
                 }
             }
 
-            atomic.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+            atomic.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
                 });
 
-            atomic.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&eggId=' + getURLParameter("eggId") + '&points=' + score.toString())
+            atomic.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
