@@ -25,6 +25,7 @@ var Config = (function () {
 
     var _contextName = null;
     var _hostURI = null;
+    var _maxAllowableGoals = null;
 
     // public interface
     return {
@@ -39,6 +40,12 @@ var Config = (function () {
         },
         getHostURI: function () {
             return _hostURI;
+        },
+        prepareGameResult: function (max) {
+            _maxAllowableGoals = max;
+        },
+        getPrepareGameResult: function () {
+            return _maxAllowableGoals;
         },
         isMobile: function () {
             return Utility.isMobile.any();
@@ -774,6 +781,42 @@ var GameObjects = (function () {
         }
     };
 
+    var _FinalMatch = {
+        getMatchFinalResults: function () {
+            console.debug(Config.getPrepareGameResult());
+            var results = [0, 0, 0];
+            var maxGoals = Config.getPrepareGameResult();
+            // config tampered, set max goals to zero
+            maxGoals = maxGoals > 3 || maxGoals < 0 ? 0 : maxGoals;
+
+            if (maxGoals === 0){
+                return results;
+            }
+
+            if (maxGoals === 3) {
+                return [1, 1, 1];
+            }
+
+            var count = 0;
+            while (count < maxGoals) {
+                console.debug("count "+count);
+                var randIndex = this.getRandomNumber(0, 3);
+                console.debug("randIndex: "+randIndex);
+                console.debug("result: "+results[randIndex]);
+                if (results[randIndex] === 1) {
+                    continue
+                }
+                results[randIndex] = 1;
+                count++;
+            }
+
+            return results;
+        },
+        getRandomNumber: function (min, max) {
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+    };
+
     return {
         // BALL
         getBallWidth: function () {
@@ -981,6 +1024,9 @@ var GameObjects = (function () {
 
         setScores: function (score) {
             return _Score.setScores(score);
+        },
+        getFinalResults: function () {
+            return _FinalMatch.getMatchFinalResults();
         }
     }
 })();
@@ -1031,7 +1077,7 @@ var StartScene = (function () {
                 ScoreCanvas.getCanvas().style.display = "block";
 
                 if (shareSection.getIsChecked()) {
-                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1204,6 +1250,7 @@ var ResultScene = (function () {
 })();
 
 var Game = (function () {
+    var results = 0;
     var _Game = {
         // time for calculate fps, max on 60 due to rAF
         delta: 0,
@@ -1243,6 +1290,8 @@ var Game = (function () {
             });
 
             if (GameObjects.getKeeperX() === undefined) {
+                results = GameObjects.getFinalResults();
+                console.debug(results);
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
             }
 
@@ -1308,7 +1357,13 @@ var Game = (function () {
             // win
             else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
                 && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
-                this.showShotIn();
+
+                if (results[GameObjects.getCurrentKick()] === 1) {
+                    this.showShotIn();
+                } else {
+                    GameObjects.setKeeperX(GameObjects.getBallCurrentX());
+                    this.showMissShot();
+                }
             }
 
             this.lastTime = this.currentTime;
@@ -1669,7 +1724,6 @@ var shareSection = (function () {
                     }, 100);
                 });
 
-
                 //close popup when clicking the esc keyboard button
                 $(document).keyup(function (event) {
                     if (event.which == '27') {
@@ -1714,6 +1768,5 @@ function getURLParameter(name) {
 
 window.addEventListener('load', Banner.init, false);
 window.addEventListener('load', ScoreCanvas.init, false);
-//window.addEventListener('load', shareSection.init, false);
 window.addEventListener('load', Application.init, false);
 window.addEventListener('load', BannerTwo.init, false);
