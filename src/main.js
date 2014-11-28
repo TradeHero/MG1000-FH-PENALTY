@@ -784,15 +784,16 @@ var GameObjects = (function () {
     var _FinalMatch = {
         getMatchFinalResults: function () {
             var results = [0, 0, 0];
-            var maxGoals = Config.getPrepareGameResult();
+
+            // get the fixed probability from client and constant 3 goals to calculate possible goals.
+            var fixedProbability = Config.getPrepareGameResult();
+            var maxGoals = Math.round(3 * fixedProbability);
+
             // config tampered, set max goals to zero
             maxGoals = maxGoals > 3 || maxGoals < 0 ? 0 : maxGoals;
-
             if (maxGoals === 0){
                 return results;
-            }
-
-            if (maxGoals === 3) {
+            } else if (maxGoals === 3) {
                 return [1, 1, 1];
             }
 
@@ -1021,6 +1022,8 @@ var GameObjects = (function () {
         setScores: function (score) {
             return _Score.setScores(score);
         },
+
+        // Get Final Results
         getFinalResults: function () {
             return _FinalMatch.getMatchFinalResults();
         }
@@ -1030,7 +1033,7 @@ var GameObjects = (function () {
 var StartScene = (function () {
     var _Start = {
         mainWindow: undefined,
-        startButton: undefined,
+        startActionButton: undefined,
 
         init: function () {
             Renderer.renderScore();
@@ -1062,13 +1065,18 @@ var StartScene = (function () {
             helpTextLabel.font_size = Config.isMobile() ? '2' : '1.5';
             helpTextLabel.text_color = 'white';
             helpTextLabel.text_allign = 'left';
-            //helpTextLabel.x = startButtonX + startButtonWidth * 0.58;
 
-            this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
-            this.startButton.cornerRadius = 35;
-            this.startButton.label.text = "";
-            this.startButton.image = Assets.images().play_now_button;
-            this.startButton.addTarget(function () {
+            // visual start button for UI only
+            var visualStartButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
+            visualStartButton.cornerRadius = 35;
+            visualStartButton.label.text = "";
+            visualStartButton.image = Assets.images().play_now_button;
+
+            // the real start button which able for user click anywhere above the share button to start
+            this.startActionButton = new UI.Button(0, 0, canvasWidth, canvasHeight * 0.7);
+            this.startActionButton.alpha = 0;
+            this.startActionButton.label.text = "";
+            this.startActionButton.addTarget(function () {
                 document.getElementById('absolcenter').removeChild(document.getElementById("bluediv"));
                 ScoreCanvas.getCanvas().style.display = "block";
 
@@ -1088,13 +1096,14 @@ var StartScene = (function () {
             }, "touch");
 
             this.mainWindow.addSubview(backgroundImageView);
-            this.mainWindow.addSubview(this.startButton);
+            this.mainWindow.addSubview(visualStartButton);
+            this.mainWindow.addSubview(this.startActionButton);
             this.mainWindow.addSubview(playNowLabel);
             this.mainWindow.addSubview(helpTextLabel);
             shareSection.init(this.mainWindow);
         },
         getStartButton: function () {
-            return this.startButton;
+            return this.startActionButton;
         }
     };
 
@@ -1299,18 +1308,16 @@ var Game = (function () {
             this.keeperTimer += this.delta;
             if (!this.showingResult && GameObjects.getCurrentKick() < 3) {
                 //GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
+                var keeperSpeed = Config.getPrepareGameResult();
 
-                if (this.keeperTimer > 0.3 && GameObjects.getCurrentKick() === 0) {
-                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
-                    this.keeperTimer = 0;
-                } else if (this.keeperTimer > 0.1 && GameObjects.getCurrentKick() === 1) {
-                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
-                    this.keeperTimer = 0;
-                } else if (this.keeperTimer > 0.05 && GameObjects.getCurrentKick() === 2) {
+                if (keeperSpeed > 0.3) {
+                    keeperSpeed = 0.3;
+                }
+
+                if (this.keeperTimer > keeperSpeed) {
                     GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
                     this.keeperTimer = 0;
                 }
-
             }
 
             Renderer.renderGoalPostAndKeeper();
