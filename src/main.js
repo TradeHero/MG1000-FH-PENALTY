@@ -783,7 +783,6 @@ var GameObjects = (function () {
 
     var _FinalMatch = {
         getMatchFinalResults: function () {
-            console.debug(Config.getPrepareGameResult());
             var results = [0, 0, 0];
             var maxGoals = Config.getPrepareGameResult();
             // config tampered, set max goals to zero
@@ -799,10 +798,7 @@ var GameObjects = (function () {
 
             var count = 0;
             while (count < maxGoals) {
-                console.debug("count "+count);
                 var randIndex = this.getRandomNumber(0, 3);
-                console.debug("randIndex: "+randIndex);
-                console.debug("result: "+results[randIndex]);
                 if (results[randIndex] === 1) {
                     continue
                 }
@@ -1195,7 +1191,7 @@ var ResultScene = (function () {
                 sender.drawView(Application.getCanvasCtx());
 
                 if (!shareSection.getIsChecked()) {
-                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                         .success(function (data, xhr) {
                             sender.enabled = false;
                             sender.image = Assets.images().share_fb_succeed;
@@ -1291,7 +1287,6 @@ var Game = (function () {
 
             if (GameObjects.getKeeperX() === undefined) {
                 results = GameObjects.getFinalResults();
-                console.debug(results);
                 GameObjects.setKeeperX(Application.getCanvasWidth() / 2);
             }
 
@@ -1461,7 +1456,7 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1483,7 +1478,7 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1543,7 +1538,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1563,7 +1558,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token"))
+                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
