@@ -270,18 +270,18 @@ var ScoreCanvas = (function () {
 
             var engagingText = document.createElement('p');
             engagingText.id = "engaging";
-            engagingText.innerHTML = "Score goals to win an iPhone!";
+            engagingText.innerHTML = "Score <b style='font-size: 1em; font-weight: 700'>100 goals</b> to win an iPhone 6!";
             engagingText.style.fontSize = Config.isMobile() ? '3em' : '2.5em';
             engagingText.style.lineHeight = Config.isMobile() ? '3em' : '2em';
             engagingText.style.color = 'white';
-            engagingText.style.fontWeight = '700';
+            engagingText.style.fontWeight = '400';
             var engagingSuppText = document.createElement('p');
             engagingSuppText.id = "engagingSupp";
-            engagingSuppText.innerHTML = "Most goals by Christmas, wins!";
+            engagingSuppText.innerHTML = "Play from now to <b style='font-size: 1em; font-weight: 700'>December 31st!</b>";
             engagingSuppText.style.fontSize = Config.isMobile() ? '2em' : '1.5em';
             //engagingSuppText.style.lineHeight = Config.isMobile() ? '1.5em' : '1.5em';
             engagingSuppText.style.color = 'white';
-            engagingSuppText.style.fontWeight = '700';
+            engagingSuppText.style.fontWeight = '400';
 
             var bluediv = document.createElement('div');
             bluediv.id = 'bluediv';
