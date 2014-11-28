@@ -15,15 +15,27 @@ var Crypto = (function () {
 
     /**
      *
+     * @param number
+     * @returns {number}
+     */
+    function numberOfDigitInNumber(number){
+        return Math.floor(log10(number) + 1)
+    }
+
+    function generateChecksumForId(id){
+        return id * Math.abs(10 - numberOfDigitInNumber(id)) % 10;
+    }
+
+    /**
+     *
      * @param eggId
      * @returns {*}
      * @private
      */
     var _encodeEgg = function (eggId) {
         var firstLayerEncodedId = Base64.Base64Encode(eggId.toString());
-        var numberOfDigitsInId = Math.floor(log10(eggId) + 1);
-        var checkSum = eggId * Math.abs(10 - numberOfDigitsInId);
-        var checkSumAppendedFirstLayerEncodedId = firstLayerEncodedId + (checkSum % 10).toString();
+        var checkSum = generateChecksumForId(eggId);
+        var checkSumAppendedFirstLayerEncodedId = firstLayerEncodedId + checkSum.toString();
         return Base64.Base64Encode(checkSumAppendedFirstLayerEncodedId);
     };
 
@@ -44,8 +56,12 @@ var Crypto = (function () {
             checkSumAppendedFirstLayerEncodedId.slice(0, -1);
         var decodedEggIdStr = Base64.Base64Decode(firstLayerEncodedId);
         var decodedEggId = parseInt(decodedEggIdStr, 10);
+
         if (!isNaN(decodedEggId)) {
-            return decodedEggId;
+            var c = generateChecksumForId(decodedEggId);
+            if (c === checkSum){
+                return decodedEggId
+            }
         }
         return 0;
     };
