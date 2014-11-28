@@ -409,7 +409,7 @@ var Renderer = (function () {
         renderGoal: function () {
             var goalText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "GOAL!!");
             goalText.font_size = "5";
-            goalText.text_color = "green";
+            goalText.text_color = "rgb(0, 255, 22)";
             goalText.font_weight = "700";
             this.mainWindow.addSubview(goalText);
         },
@@ -1081,7 +1081,7 @@ var StartScene = (function () {
                 ScoreCanvas.getCanvas().style.display = "block";
 
                 if (shareSection.getIsChecked()) {
-                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                    Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1160,7 +1160,7 @@ var ResultScene = (function () {
             dlSectionButton.image = Assets.images().ios_dl_section;
             dlSectionButton.label.text = "";
             dlSectionButton.addTarget(function (sender) {
-                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1173,7 +1173,7 @@ var ResultScene = (function () {
             if (Utility.isMobile.Android()) {
                 dlSectionButton.image = Assets.images().android_dl_section;
                 dlSectionButton.addTarget(function (sender) {
-                    atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                         .success(function (data, xhr) {
                             console.log("success");
                         })
@@ -1200,7 +1200,7 @@ var ResultScene = (function () {
                 sender.drawView(Application.getCanvasCtx());
 
                 if (!shareSection.getIsChecked()) {
-                    atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                    Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                         .success(function (data, xhr) {
                             sender.enabled = false;
                             sender.image = Assets.images().share_fb_succeed;
@@ -1222,13 +1222,13 @@ var ResultScene = (function () {
                 }
             }
 
-            atomic.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+            Network.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
                 });
 
-            atomic.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+            Network.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
                 })
                 .error(function (data, xhr) {
@@ -1455,7 +1455,7 @@ var Banner = (function () {
             //
 
             $(banner).on('click', function () {
-                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1463,7 +1463,7 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1477,7 +1477,7 @@ var Banner = (function () {
             });
 
             $(banner).on('touchstart', function () {
-                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1485,7 +1485,7 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1537,7 +1537,7 @@ var BannerTwo = (function () {
                 : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-apple.png\')';
 
             $(banner).on('click', function () {
-                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1545,7 +1545,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1557,7 +1557,7 @@ var BannerTwo = (function () {
             });
 
             $(banner).on('touchstart', function () {
-                atomic.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1565,7 +1565,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                atomic.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
