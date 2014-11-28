@@ -22,6 +22,11 @@ var Crypto = (function () {
         return Math.floor(log10(number) + 1)
     }
 
+    /**
+     *
+     * @param id
+     * @returns {number}
+     */
     function generateChecksumForId(id){
         return id * Math.abs(10 - numberOfDigitInNumber(id)) % 10;
     }
