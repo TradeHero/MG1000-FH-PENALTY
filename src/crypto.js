@@ -4,10 +4,21 @@
 
 var Crypto = (function () {
 
+    /**
+     *
+     * @param x
+     * @returns {number}
+     */
     function log10(x) {
         return Math.log(x) / Math.LN10;
     }
 
+    /**
+     *
+     * @param eggId
+     * @returns {*}
+     * @private
+     */
     var _encodeEgg = function (eggId) {
         var firstLayerEncodedId = Base64.Base64Encode(eggId.toString());
         var numberOfDigitsInId = Math.floor(log10(eggId) + 1);
@@ -16,6 +27,12 @@ var Crypto = (function () {
         return Base64.Base64Encode(checkSumAppendedFirstLayerEncodedId);
     };
 
+    /**
+     *
+     * @param encodedEggId
+     * @returns {*}
+     * @private
+     */
     var _decodeEgg = function (encodedEggId) {
         var checkSumAppendedFirstLayerEncodedId = Base64.Base64Decode(encodedEggId);
         var checkSumString = checkSumAppendedFirstLayerEncodedId.slice(-1);

@@ -409,7 +409,7 @@ var Renderer = (function () {
         renderGoal: function () {
             var goalText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 30, "GOAL!!");
             goalText.font_size = "5";
-            goalText.text_color = "green";
+            goalText.text_color = "rgb(0, 255, 22)";
             goalText.font_weight = "700";
             this.mainWindow.addSubview(goalText);
         },

@@ -6,23 +6,52 @@
     <title></title>
 </head>
 <body>
+<label for="code">Enter your code to encrypt or decrypt</label>
+<input type="text" id="code"/>
+<button onclick="decrypt()">Decode</button>
+<button onclick="encrypt()">Encode</button>
+
 <script>
 
-//    function testEncoding(n){
-//        for (var i = 0; i < n; i++) {
-//            var encodedEggId = Crypto.encodeEggId(i);
-//            var decodedEggId = Crypto.decodeEggId(encodedEggId);
-//            if (decodedEggId != i) {
-//                console.log("Failed for " + i);
-//                return;
-//            }
-//        }
-//        console.log("Succeed for "+ n);
-//    }
-//    testEncoding(100000);
+    function decrypt() {
+        var input = document.getElementById("code").value.toString();
+        var output = Crypto.decodeEggId(input);
 
-    console.log(Crypto.encodeEggId(123421));
+        var p = document.getElementById("output");
+
+        if (p == null || p == undefined) {
+            p = document.createElement("p");
+            p.id = "output";
+            p.innerHTML = output.toString();
+            document.body.appendChild(p);
+        } else {
+            p.innerHTML = output;
+        }
+    }
+
+    function encrypt() {
+        var x = document.getElementById("code");
+        var input = parseInt(x.value, 10);
+        var output;
+        if (input == null || input == undefined) {
+            output = "Unable to parse id, must be int!!"
+        } else {
+            output = Crypto.encodeEggId(input);
+        }
+
+        var p = document.getElementById("output");
+        console.debug(p);
+        if (p == null || p == undefined) {
+            p = document.createElement("p");
+            p.id = "output";
+            p.innerHTML = output;
+            document.body.appendChild(p);
+        } else {
+            p.innerHTML = output;
+        }
+    }
 
 </script>
+
 </body>
 </html>
