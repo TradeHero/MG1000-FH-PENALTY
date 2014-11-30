@@ -784,15 +784,16 @@ var GameObjects = (function () {
     var _FinalMatch = {
         getMatchFinalResults: function () {
             var results = [0, 0, 0];
-            var maxGoals = Config.getPrepareGameResult();
+
+            // get the fixed probability from client and constant 3 goals to calculate possible goals.
+            var fixedProbability = Config.getPrepareGameResult();
+            var maxGoals = Math.round(3 * fixedProbability);
+
             // config tampered, set max goals to zero
             maxGoals = maxGoals > 3 || maxGoals < 0 ? 0 : maxGoals;
-
             if (maxGoals === 0){
                 return results;
-            }
-
-            if (maxGoals === 3) {
+            } else if (maxGoals === 3) {
                 return [1, 1, 1];
             }
 
@@ -1021,6 +1022,8 @@ var GameObjects = (function () {
         setScores: function (score) {
             return _Score.setScores(score);
         },
+
+        // Get Final Results
         getFinalResults: function () {
             return _FinalMatch.getMatchFinalResults();
         }
@@ -1030,7 +1033,7 @@ var GameObjects = (function () {
 var StartScene = (function () {
     var _Start = {
         mainWindow: undefined,
-        startButton: undefined,
+        startActionButton: undefined,
 
         init: function () {
             Renderer.renderScore();
@@ -1062,13 +1065,18 @@ var StartScene = (function () {
             helpTextLabel.font_size = Config.isMobile() ? '2' : '1.5';
             helpTextLabel.text_color = 'white';
             helpTextLabel.text_allign = 'left';
-            //helpTextLabel.x = startButtonX + startButtonWidth * 0.58;
 
-            this.startButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
-            this.startButton.cornerRadius = 35;
-            this.startButton.label.text = "";
-            this.startButton.image = Assets.images().play_now_button;
-            this.startButton.addTarget(function () {
+            // visual start button for UI only
+            var visualStartButton = new UI.Button(startButtonX, startButtonY, startButtonWidth, startButtonHeight);
+            visualStartButton.cornerRadius = 35;
+            visualStartButton.label.text = "";
+            visualStartButton.image = Assets.images().play_now_button;
+
+            // the real start button which able for user click anywhere above the share button to start
+            this.startActionButton = new UI.Button(0, 0, canvasWidth, canvasHeight * 0.7);
+            this.startActionButton.alpha = 0;
+            this.startActionButton.label.text = "";
+            this.startActionButton.addTarget(function () {
                 document.getElementById('absolcenter').removeChild(document.getElementById("bluediv"));
                 ScoreCanvas.getCanvas().style.display = "block";
 
@@ -1088,13 +1096,14 @@ var StartScene = (function () {
             }, "touch");
 
             this.mainWindow.addSubview(backgroundImageView);
-            this.mainWindow.addSubview(this.startButton);
+            this.mainWindow.addSubview(visualStartButton);
+            this.mainWindow.addSubview(this.startActionButton);
             this.mainWindow.addSubview(playNowLabel);
             this.mainWindow.addSubview(helpTextLabel);
             shareSection.init(this.mainWindow);
         },
         getStartButton: function () {
-            return this.startButton;
+            return this.startActionButton;
         }
     };
 
@@ -1146,62 +1155,19 @@ var ResultScene = (function () {
             var dlSectionButtonWidth = canvasWidth * 0.9;
             var dlSectionButtonHeight = dlSectionButtonWidth / dlSectionButtonRatio;
             var dlSectionButtonX = canvasWidth / 2 - dlSectionButtonWidth / 2;
-            var dlSectionButtonY = canvasHeight * 0.45 - dlSectionButtonHeight / 2;
+            var dlSectionButtonY = canvasHeight * 0.5 - dlSectionButtonHeight / 2;
             var dlSectionButton = new UI.Button(dlSectionButtonX, dlSectionButtonY, dlSectionButtonWidth, dlSectionButtonHeight);
             dlSectionButton.image = Assets.images().ios_dl_section;
             dlSectionButton.label.text = "";
-            dlSectionButton.addTarget(function (sender) {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
-            }, "touch");
-
-            if (Utility.isMobile.Android()) {
-                dlSectionButton.image = Assets.images().android_dl_section;
-                dlSectionButton.addTarget(function (sender) {
-                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                        .success(function (data, xhr) {
-                            console.log("success");
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                    window.location.href = "https://play.google.com/store/apps/details?id=com.myhero.fh";
-                }, "touch");
-            }
-
 
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
-            var shareButtonWidth = canvasWidth * 0.6;
+            var shareButtonWidth = canvasWidth * 0.7;
             var shareButtonHeight = shareButtonWidth / shareButtonRatio;
             var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
             var shareButtonY = canvasHeight * 0.75 - shareButtonHeight / 2;
             var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
             shareButton.image = Assets.images().share_fb;
             shareButton.label.text = "";
-
-            shareButton.addTarget(function (sender) {
-                sender.enabled = false;
-                sender.image = Assets.images().share_fb_succeed;
-                sender.drawView(Application.getCanvasCtx());
-
-                if (!shareSection.getIsChecked()) {
-                    Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                        .success(function (data, xhr) {
-                            sender.enabled = false;
-                            sender.image = Assets.images().share_fb_succeed;
-                            sender.drawView(Application.getCanvasCtx());
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                }
-            }, "touch");
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
@@ -1230,9 +1196,51 @@ var ResultScene = (function () {
 
 
             if (!shareSection.getIsChecked()) {
+                shareButton.y = dlSectionButtonY;
+                shareButton.addTarget(function (sender) {
+                    sender.enabled = false;
+                    sender.image = Assets.images().share_fb_succeed;
+                    sender.drawView(Application.getCanvasCtx());
+
+                    if (!shareSection.getIsChecked()) {
+                        Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                            .success(function (data, xhr) {
+                                sender.enabled = false;
+                                sender.image = Assets.images().share_fb_succeed;
+                                sender.drawView(Application.getCanvasCtx());
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                    }
+                }, "touch");
+
                 this.mainWindow.addSubview(shareButton);
             } else {
-                dlSectionButton.y = shareButtonY;
+                dlSectionButton.addTarget(function (sender) {
+                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                        .success(function (data, xhr) {
+                            console.log("success");
+                        })
+                        .error(function (data, xhr) {
+                            console.log("error?");
+                        });
+                    window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
+                }, "touch");
+
+                if (Utility.isMobile.Android()) {
+                    dlSectionButton.image = Assets.images().android_dl_section;
+                    dlSectionButton.addTarget(function (sender) {
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                            .success(function (data, xhr) {
+                                console.log("success");
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                        window.open("https://play.google.com/store/apps/details?id=com.myhero.fh");
+                    }, "touch");
+                }
                 this.mainWindow.addSubview(dlSectionButton);
             }
         }
@@ -1299,18 +1307,16 @@ var Game = (function () {
             this.keeperTimer += this.delta;
             if (!this.showingResult && GameObjects.getCurrentKick() < 3) {
                 //GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
+                var keeperSpeed = Config.getPrepareGameResult();
 
-                if (this.keeperTimer > 0.3 && GameObjects.getCurrentKick() === 0) {
-                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
-                    this.keeperTimer = 0;
-                } else if (this.keeperTimer > 0.1 && GameObjects.getCurrentKick() === 1) {
-                    GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
-                    this.keeperTimer = 0;
-                } else if (this.keeperTimer > 0.05 && GameObjects.getCurrentKick() === 2) {
+                if (keeperSpeed > 0.3) {
+                    keeperSpeed = 0.3;
+                }
+
+                if (this.keeperTimer > keeperSpeed) {
                     GameObjects.setKeeperX(GameObjects.getNewKeeperPosition());
                     this.keeperTimer = 0;
                 }
-
             }
 
             Renderer.renderGoalPostAndKeeper();
@@ -1464,9 +1470,9 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = !Utility.isMobile.Android()
+                window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             $(banner).on('touchstart', function () {
@@ -1486,9 +1492,9 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = !Utility.isMobile.Android()
+                window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             if (Utility.isMobile.any()) {
@@ -1546,7 +1552,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
             });
 
             $(banner).on('touchstart', function () {
@@ -1566,7 +1572,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
             });
 
             if (Utility.isMobile.any()) {
