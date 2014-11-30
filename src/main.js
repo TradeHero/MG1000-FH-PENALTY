@@ -1155,62 +1155,19 @@ var ResultScene = (function () {
             var dlSectionButtonWidth = canvasWidth * 0.9;
             var dlSectionButtonHeight = dlSectionButtonWidth / dlSectionButtonRatio;
             var dlSectionButtonX = canvasWidth / 2 - dlSectionButtonWidth / 2;
-            var dlSectionButtonY = canvasHeight * 0.45 - dlSectionButtonHeight / 2;
+            var dlSectionButtonY = canvasHeight * 0.5 - dlSectionButtonHeight / 2;
             var dlSectionButton = new UI.Button(dlSectionButtonX, dlSectionButtonY, dlSectionButtonWidth, dlSectionButtonHeight);
             dlSectionButton.image = Assets.images().ios_dl_section;
             dlSectionButton.label.text = "";
-            dlSectionButton.addTarget(function (sender) {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
-            }, "touch");
-
-            if (Utility.isMobile.Android()) {
-                dlSectionButton.image = Assets.images().android_dl_section;
-                dlSectionButton.addTarget(function (sender) {
-                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                        .success(function (data, xhr) {
-                            console.log("success");
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                    window.location.href = "https://play.google.com/store/apps/details?id=com.myhero.fh";
-                }, "touch");
-            }
-
 
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
-            var shareButtonWidth = canvasWidth * 0.6;
+            var shareButtonWidth = canvasWidth * 0.7;
             var shareButtonHeight = shareButtonWidth / shareButtonRatio;
             var shareButtonX = canvasWidth / 2 - shareButtonWidth / 2;
             var shareButtonY = canvasHeight * 0.75 - shareButtonHeight / 2;
             var shareButton = new UI.Button(shareButtonX, shareButtonY, shareButtonWidth, shareButtonHeight);
             shareButton.image = Assets.images().share_fb;
             shareButton.label.text = "";
-
-            shareButton.addTarget(function (sender) {
-                sender.enabled = false;
-                sender.image = Assets.images().share_fb_succeed;
-                sender.drawView(Application.getCanvasCtx());
-
-                if (!shareSection.getIsChecked()) {
-                    Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                        .success(function (data, xhr) {
-                            sender.enabled = false;
-                            sender.image = Assets.images().share_fb_succeed;
-                            sender.drawView(Application.getCanvasCtx());
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                }
-            }, "touch");
 
             if (Utility.isMobile.any()) {
                 resultLabel.font_size *= Application.getMobileScale();
@@ -1239,9 +1196,51 @@ var ResultScene = (function () {
 
 
             if (!shareSection.getIsChecked()) {
+                shareButton.y = dlSectionButtonY;
+                shareButton.addTarget(function (sender) {
+                    sender.enabled = false;
+                    sender.image = Assets.images().share_fb_succeed;
+                    sender.drawView(Application.getCanvasCtx());
+
+                    if (!shareSection.getIsChecked()) {
+                        Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
+                            .success(function (data, xhr) {
+                                sender.enabled = false;
+                                sender.image = Assets.images().share_fb_succeed;
+                                sender.drawView(Application.getCanvasCtx());
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                    }
+                }, "touch");
+
                 this.mainWindow.addSubview(shareButton);
             } else {
-                dlSectionButton.y = shareButtonY;
+                dlSectionButton.addTarget(function (sender) {
+                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                        .success(function (data, xhr) {
+                            console.log("success");
+                        })
+                        .error(function (data, xhr) {
+                            console.log("error?");
+                        });
+                    window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
+                }, "touch");
+
+                if (Utility.isMobile.Android()) {
+                    dlSectionButton.image = Assets.images().android_dl_section;
+                    dlSectionButton.addTarget(function (sender) {
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                            .success(function (data, xhr) {
+                                console.log("success");
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                        window.open("https://play.google.com/store/apps/details?id=com.myhero.fh");
+                    }, "touch");
+                }
                 this.mainWindow.addSubview(dlSectionButton);
             }
         }
@@ -1471,9 +1470,9 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = !Utility.isMobile.Android()
+                window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             $(banner).on('touchstart', function () {
@@ -1493,9 +1492,9 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = !Utility.isMobile.Android()
+                window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
-                    : "https://play.google.com/store/apps/details?id=com.myhero.fh";
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             if (Utility.isMobile.any()) {
@@ -1553,7 +1552,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
             });
 
             $(banner).on('touchstart', function () {
@@ -1573,7 +1572,7 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.location.href = "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4";
+                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
             });
 
             if (Utility.isMobile.any()) {
