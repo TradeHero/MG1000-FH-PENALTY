@@ -28,7 +28,7 @@
         // somewhere from FB or anywhere possible passing in first name
         Config.setContextName("Ryne");
         Config.setHostURI("http://192.168.1.92:44333/");
-        Config.prepareGameResult(0.1);
+        Config.prepareGameResult(1.0);
 
         //call from client
         Assets.initialise({
@@ -49,7 +49,9 @@
             share_fb_succeed: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb-succeed.png",
             play_now_button: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png",
             ios_dl_section: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dl-section-ios.png",
-            android_dl_section: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dl-section-android.png"
+            android_dl_section: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/dl-section-android.png",
+            img_goalkeeper_catch_left: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper-catch-left.png",
+            img_goalkeeper_catch_right: "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-goalkeeper-catch-right.png"
         }, function () {
             //completion callback
             StartScene.init();

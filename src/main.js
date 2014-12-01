@@ -363,18 +363,23 @@ var Renderer = (function () {
                 GameObjects.setGoalPostHeight(goalPostImage.height * Application.getScale());
                 GameObjects.setGoalPostX(Application.getCanvasWidth() / 2 - GameObjects.getGoalPostWidth() / 2);
                 GameObjects.setGoalPostY(60 * Application.getScale());
-                GameObjects.setKeeperWidth(goalkeeperImage.width * Application.getScale());
-                GameObjects.setKeeperHeight(goalkeeperImage.height * Application.getScale());
                 GameObjects.setKeeperY(80 * Application.getScale());
+                GameObjects.setKeeperPost(Assets.images().goalkeeper);
             }
+
+            var keeperRatio = GameObjects.getKeeperPost().width / GameObjects.getKeeperPost().height;
+            GameObjects.getKeeperPost().height = goalkeeperImage.height;
+            GameObjects.getKeeperPost().width = keeperRatio * GameObjects.getKeeperPost().height;
+            GameObjects.setKeeperWidth(GameObjects.getKeeperPost().width * Application.getScale());
+            GameObjects.setKeeperHeight(GameObjects.getKeeperPost().height * Application.getScale());
 
             var goalPostImageView = new UI.ImageView(GameObjects.getGoalPostX(), GameObjects.getGoalPostY(),
                 GameObjects.getGoalPostWidth(), GameObjects.getGoalPostHeight(), goalPostImage);
-            var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), GameObjects.getKeeperY(), GameObjects.getKeeperWidth(), GameObjects.getKeeperHeight(), goalkeeperImage);
+            var goalkeeperImageView = new UI.ImageView(GameObjects.getKeeperX(), GameObjects.getKeeperY(), GameObjects.getKeeperWidth(), GameObjects.getKeeperHeight(), GameObjects.getKeeperPost());
 
             if (GameObjects.getGuardMaxX() === undefined) {
-                GameObjects.setGuardMinX(GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth() * 0.05);
-                GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + GameObjects.getGoalPostWidth() * 0.9) - GameObjects.getKeeperWidth());
+                GameObjects.setGuardMinX(GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth() * 0.3);
+                GameObjects.setGuardMaxX((GameObjects.getGuardMinX() + GameObjects.getGoalPostWidth() * 0.4) - GameObjects.getKeeperWidth());
             }
             this.mainWindow.addSubview(goalPostImageView);
             this.mainWindow.addSubview(goalkeeperImageView);
@@ -388,6 +393,7 @@ var Renderer = (function () {
                 GameObjects.setBallHeight(ballImage.height * Application.getScale() * 1.2);
                 GameObjects.setBallCurrentX(GameObjects.getBallStartX());
                 GameObjects.setBallCurrentY(GameObjects.getBallStartY());
+                GameObjects.setBallAlpha(1.0);
             }
 
             if (GameObjects.getCurrentKick() === 0) {
@@ -403,6 +409,7 @@ var Renderer = (function () {
             var ball = new UI.Button(GameObjects.getBallCurrentX(), GameObjects.getBallCurrentY(), GameObjects.getBallWidth(), GameObjects.getBallHeight());
             ball.image = ballImage;
             ball.label.text = "";
+            ball.alpha = GameObjects.getBallAlpha();
             this.mainWindow.addSubview(ball);
         },
 
@@ -522,87 +529,68 @@ var GameObjects = (function () {
         ballCurrentY: undefined,
         ballVelocity: undefined,
         dragDuration: undefined,
+        ballAlpha: undefined,
 
         getBallWidth: function () {
             return this.ballWidth;
         },
-
         getBallHeight: function () {
             return this.ballHeight;
         },
-
         setBallWidth: function (width) {
             this.ballWidth = width;
         },
-
         setBallHeight: function (height) {
             this.ballHeight = height;
         },
-
         getDragStartX: function () {
             return this.dragStartX;
         },
-
         getDragStartY: function () {
             return this.dragStartY;
         },
-
         setDragStartX: function (x) {
             this.dragStartX = x;
         },
-
         setDragStartY: function (y) {
             this.dragStartY = y;
         },
-
         getDragEndX: function () {
             return this.dragEndX;
         },
-
         getDragEndY: function () {
             return this.dragEndY;
         },
-
         setDragEndX: function (x) {
             this.dragEndX = x;
         },
-
         setDragEndY: function (y) {
             this.dragEndY = y;
         },
-
         getBallStartX: function () {
             return this.ballStartX;
         },
-
         getBallStartY: function () {
             return this.ballStartY;
         },
-
         setBallStartX: function (x) {
             this.ballStartX = x;
         },
-
         setBallStartY: function (y) {
             this.ballStartY = y;
         },
-
         getBallCurrentX: function () {
             return this.ballCurrentX;
         },
-
         getBallCurrentY: function () {
             return this.ballCurrentY;
         },
-
         setBallCurrentX: function (x) {
             this.ballCurrentX = x;
         },
-
         setBallCurrentY: function (y) {
             this.ballCurrentY = y;
         },
-
         getAngle: function () {
             if (this.getDragEndX() === undefined) return undefined;
 
@@ -618,15 +606,18 @@ var GameObjects = (function () {
 
             return parseInt((a2 - a1) * 180 / Math.PI + 360) % 360;
         },
-
         getDragDuration: function () {
             return this.dragDuration;
         },
-
         setDragDuration: function (d) {
             this.dragDuration = d;
         },
-
+        getBallAlpha : function () {
+            return this.ballAlpha;
+        },
+        setBallAlpha : function (alpha) {
+            this.ballAlpha = alpha
+        },
         getVelocity: function () {
             if (this.getDragEndX() === undefined) return undefined;
 
@@ -642,7 +633,6 @@ var GameObjects = (function () {
 
             return velocity;
         },
-
         resetBall: function () {
             this.dragStartX = undefined;
             this.dragStartY = undefined;
@@ -652,6 +642,7 @@ var GameObjects = (function () {
             this.ballCurrentY = this.ballStartY;
             this.ballVelocity = undefined;
             this.dragDuration = undefined;
+            this.ballAlpha = 1.0;
         }
     };
 
@@ -662,55 +653,50 @@ var GameObjects = (function () {
         keeperY: undefined,
         keeperWidth: undefined,
         keeperHeight: undefined,
+        keeperPost: undefined,
 
         getKeeperWidth: function () {
             return this.keeperWidth;
         },
-
         getKeeperHeight: function () {
             return this.keeperHeight;
         },
-
         setKeeperWidth: function (width) {
             this.keeperWidth = width;
         },
-
         setKeeperHeight: function (height) {
             this.keeperHeight = height;
         },
-
         getGuardMinX: function () {
             return this.guardMinX;
         },
-
         getGuardMaxX: function () {
             return this.guardMaxX;
         },
-
         setGuardMinX: function (min) {
             this.guardMinX = min;
         },
-
         setGuardMaxX: function (max) {
             this.guardMaxX = max;
         },
-
         getKeeperX: function () {
             return this.keeperX;
         },
-
         getKeeperY: function () {
             return this.keeperY;
         },
-
         setKeeperX: function (x) {
             this.keeperX = x;
         },
-
         setKeeperY: function (y) {
             this.keeperY = y;
         },
-
+        getKeeperPost: function () {
+            return this.keeperPost;
+        },
+        setKeeperPost: function (keeperPost) {
+            this.keeperPost = keeperPost;
+        },
         getNewKeeperPosition: function () {
             return Math.random() * (this.getGuardMaxX() - this.getGuardMinX()) + this.getGuardMinX();
         }
@@ -819,210 +805,171 @@ var GameObjects = (function () {
         getBallWidth: function () {
             return _Ball.getBallWidth();
         },
-
         getBallHeight: function () {
             return _Ball.getBallHeight();
         },
-
         setBallWidth: function (width) {
             return _Ball.setBallWidth(width);
         },
-
         setBallHeight: function (height) {
             return _Ball.setBallHeight(height);
         },
-
         getDragStartX: function () {
             return _Ball.getDragStartX();
         },
-
         getDragStartY: function () {
             return _Ball.getDragStartY();
         },
-
         setDragStartX: function (x) {
             return _Ball.setDragStartX(x);
         },
-
         setDragStartY: function (y) {
             return _Ball.setDragStartY(y);
         },
-
         getDragEndX: function () {
             return _Ball.getDragEndX();
         },
-
         getDragEndY: function () {
             return _Ball.getDragEndY();
         },
-
         setDragEndX: function (x) {
             return _Ball.setDragEndX(x);
         },
-
         setDragEndY: function (y) {
             return _Ball.setDragEndY(y);
         },
-
         getBallStartX: function () {
             return _Ball.getBallStartX();
         },
-
         getBallStartY: function () {
             return _Ball.getBallStartY();
         },
-
         setBallStartX: function (x) {
             return _Ball.setBallStartX(x);
         },
-
         setBallStartY: function (y) {
             return _Ball.setBallStartY(y);
         },
-
         getBallCurrentX: function () {
             return _Ball.getBallCurrentX();
         },
-
         getBallCurrentY: function () {
             return _Ball.getBallCurrentY();
         },
-
         setBallCurrentX: function (x) {
             return _Ball.setBallCurrentX(x);
         },
-
         setBallCurrentY: function (y) {
             return _Ball.setBallCurrentY(y);
         },
-
         getAngle: function () {
             return _Ball.getAngle();
         },
-
         getDragDuration: function () {
             return _Ball.getDragDuration();
         },
-
         setDragDuration: function (d) {
             return _Ball.setDragDuration(d);
         },
-
         getVelocity: function () {
             return _Ball.getVelocity();
         },
-
+        getBallAlpha: function () {
+            return _Ball.getBallAlpha();
+        },
+        setBallAlpha: function (alpha) {
+            return _Ball.setBallAlpha(alpha);
+        },
+        // KEEPER
         getGuardMinX: function () {
             return _Keeper.getGuardMinX();
         },
-
-        // KEEPER
         getKeeperWidth: function () {
             return _Keeper.getKeeperWidth();
         },
-
         getKeeperHeight: function () {
             return _Keeper.getKeeperHeight();
         },
-
         setKeeperWidth: function (width) {
             return _Keeper.setKeeperWidth(width);
         },
-
         setKeeperHeight: function (height) {
             return _Keeper.setKeeperHeight(height);
         },
-
         getGuardMaxX: function () {
             return _Keeper.getGuardMaxX();
         },
-
         setGuardMinX: function (min) {
             return _Keeper.setGuardMinX(min);
         },
-
         setGuardMaxX: function (max) {
             return _Keeper.setGuardMaxX(max);
         },
-
         getKeeperX: function () {
             return _Keeper.getKeeperX();
         },
-
         getKeeperY: function () {
             return _Keeper.getKeeperY();
         },
-
         setKeeperX: function (x) {
             return _Keeper.setKeeperX(x);
         },
-
         setKeeperY: function (y) {
             return _Keeper.setKeeperY(y);
         },
-
+        getKeeperPost: function () {
+            return _Keeper.getKeeperPost();
+        },
+        setKeeperPost: function (keeperPost) {
+            return _Keeper.setKeeperPost(keeperPost);
+        },
         getNewKeeperPosition: function () {
             return _Keeper.getNewKeeperPosition();
         },
-
         resetBall: function () {
             return _Ball.resetBall();
         },
-
         // GOALPOST
         getGoalPostX: function () {
             return _GoalPost.getGoalPostX();
         },
-
         setGoalPostX: function (x) {
             return _GoalPost.setGoalPostX(x);
         },
-
         getGoalPostY: function () {
             return _GoalPost.getGoalPostY();
         },
-
         setGoalPostY: function (y) {
             return _GoalPost.setGoalPostY(y);
         },
-
         getGoalPostWidth: function () {
             return _GoalPost.getGoalPostWidth();
         },
-
         setGoalPostWidth: function (width) {
             return _GoalPost.setGoalPostWidth(width);
         },
-
         getGoalPostHeight: function () {
             return _GoalPost.getGoalPostHeight();
         },
-
         setGoalPostHeight: function (height) {
             return _GoalPost.setGoalPostHeight(height);
         },
-
         // Score
         getChance: function () {
             return _Score.getChance();
         },
-
         getCurrentKick: function () {
             return _Score.getCurrentKick();
         },
-
         setCurrentKick: function (k) {
             return _Score.setCurrentKick(k);
         },
-
         getScores: function () {
             return _Score.getScores();
         },
-
         setScores: function (score) {
             return _Score.setScores(score);
         },
-
         // Get Final Results
         getFinalResults: function () {
             return _FinalMatch.getMatchFinalResults();
@@ -1266,6 +1213,7 @@ var Game = (function () {
         kickLabelTimer: 0,
         kickLabelAlpha: 0,
         showingResult: false,
+        randomNum: Math.round(Math.random()),
 
         loop: function () {
             var self = this;
@@ -1309,8 +1257,8 @@ var Game = (function () {
                 //GameObjects.setKeeperX(GameObjects.getKeeperX() - this.delta * 500 * Application.getScale() * this.keeperDirection);
                 var keeperSpeed = Config.getPrepareGameResult();
 
-                if (keeperSpeed > 0.3) {
-                    keeperSpeed = 0.3;
+                if (keeperSpeed > 0.2) {
+                    keeperSpeed = 0.2;
                 }
 
                 if (this.keeperTimer > keeperSpeed) {
@@ -1358,11 +1306,16 @@ var Game = (function () {
             // win
             else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
                 && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
-
                 if (results[GameObjects.getCurrentKick()] === 1) {
-                    this.showShotIn();
+                    console.log(this.randomNum);
+                    if (this.randomNum === 0) {
+                        this.keeperBlockTheBall();
+                        this.showMissShot();
+                    } else {
+                        this.showShotIn();
+                    }
                 } else {
-                    GameObjects.setKeeperX(GameObjects.getBallCurrentX());
+                    this.keeperBlockTheBall();
                     this.showMissShot();
                 }
             }
@@ -1370,8 +1323,22 @@ var Game = (function () {
             this.lastTime = this.currentTime;
         },
 
+        keeperBlockTheBall: function () {
+            if (GameObjects.getBallCurrentX() > GameObjects.getGuardMaxX()) {
+                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_catch_left);
+                GameObjects.setBallAlpha(0);
+            } else if (GameObjects.getBallCurrentX() < GameObjects.getGuardMinX()) {
+                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_catch_right);
+                GameObjects.setBallAlpha(0);
+            }
+
+            GameObjects.setKeeperX(GameObjects.getBallCurrentX());
+        },
+
         newShot: function () {
+            this.randomNum = Math.round(Math.random());
             GameObjects.resetBall();
+            GameObjects.setKeeperPost(Assets.images().goalkeeper);
         },
 
         showShotIn: function () {
@@ -1531,9 +1498,9 @@ var BannerTwo = (function () {
         },
 
         setUpContent: function (banner) {
-            banner.style.background = Utility.isMobile.Android()
-                ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-google.png\')'
-                : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-apple.png\')';
+            banner.style.background = Utility.isMobile.iOS()
+                ? 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-apple.png\')'
+                : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-google.png\')';
 
             $(banner).on('click', function () {
                 Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
