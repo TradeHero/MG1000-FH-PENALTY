@@ -367,11 +367,11 @@ var Renderer = (function () {
                 GameObjects.setKeeperPost(Assets.images().goalkeeper);
             }
 
-            var keeperRatio = GameObjects.getKeeperPost().width / GameObjects.getKeeperPost().height;
-            GameObjects.getKeeperPost().height = goalkeeperImage.height;
-            GameObjects.getKeeperPost().width = keeperRatio * GameObjects.getKeeperPost().height;
-            GameObjects.setKeeperWidth(GameObjects.getKeeperPost().width * Application.getScale());
-            GameObjects.setKeeperHeight(GameObjects.getKeeperPost().height * Application.getScale());
+            //var keeperRatio = GameObjects.getKeeperPost().width / GameObjects.getKeeperPost().height;
+            //GameObjects.getKeeperPost().height = goalkeeperImage.height;
+            //GameObjects.getKeeperPost().width = keeperRatio * GameObjects.getKeeperPost().height;
+            //GameObjects.setKeeperWidth(GameObjects.getKeeperPost().width * Application.getScale());
+            //GameObjects.setKeeperHeight(GameObjects.getKeeperPost().height * Application.getScale());
 
             var goalPostImageView = new UI.ImageView(GameObjects.getGoalPostX(), GameObjects.getGoalPostY(),
                 GameObjects.getGoalPostWidth(), GameObjects.getGoalPostHeight(), goalPostImage);
@@ -696,6 +696,8 @@ var GameObjects = (function () {
         },
         setKeeperPost: function (keeperPost) {
             this.keeperPost = keeperPost;
+            this.setKeeperWidth(keeperPost.width * Application.getScale());
+            this.setKeeperHeight(keeperPost.height * Application.getScale());
         },
         getNewKeeperPosition: function () {
             return Math.random() * (this.getGuardMaxX() - this.getGuardMinX()) + this.getGuardMinX();
@@ -1213,7 +1215,7 @@ var Game = (function () {
         kickLabelTimer: 0,
         kickLabelAlpha: 0,
         showingResult: false,
-        randomNum: Math.round(Math.random()),
+        randomNum: (Math.random() > 0.3) ? 1 : 0,
 
         loop: function () {
             var self = this;
@@ -1306,12 +1308,20 @@ var Game = (function () {
             // win
             else if (GameObjects.getBallCurrentY() <= GameObjects.getGoalPostY() + GameObjects.getGoalPostHeight() * 0.7
                 && GameObjects.getBallCurrentX() > GameObjects.getGoalPostX() && GameObjects.getBallCurrentX() + GameObjects.getBallWidth() < GameObjects.getGoalPostX() + GameObjects.getGoalPostWidth()) {
+
+                var middlePoint = (GameObjects.getGuardMaxX() + GameObjects.getGuardMinX()) / 2;
                 if (results[GameObjects.getCurrentKick()] === 1) {
-                    console.log(this.randomNum);
                     if (this.randomNum === 0) {
                         this.keeperBlockTheBall();
                         this.showMissShot();
                     } else {
+                        if (GameObjects.getBallCurrentX() > middlePoint) {
+                            GameObjects.setKeeperX(GameObjects.getGuardMinX() - GameObjects.getGoalPostWidth() * 0.15);
+                            GameObjects.setKeeperPost(Assets.images().img_goalkeeper_noball_left);
+                        } else {
+                            GameObjects.setKeeperX(GameObjects.getGuardMaxX());
+                            GameObjects.setKeeperPost(Assets.images().img_goalkeeper_noball_right);
+                        }
                         this.showShotIn();
                     }
                 } else {
@@ -1325,18 +1335,18 @@ var Game = (function () {
 
         keeperBlockTheBall: function () {
             if (GameObjects.getBallCurrentX() > GameObjects.getGuardMaxX()) {
-                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_catch_left);
+                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_dash_right);
                 GameObjects.setBallAlpha(0);
+                GameObjects.setKeeperX(GameObjects.getBallCurrentX() - GameObjects.getKeeperWidth() * 0.7);
             } else if (GameObjects.getBallCurrentX() < GameObjects.getGuardMinX()) {
-                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_catch_right);
+                GameObjects.setKeeperPost(Assets.images().img_goalkeeper_dash_left);
                 GameObjects.setBallAlpha(0);
+                GameObjects.setKeeperX(GameObjects.getBallCurrentX());
             }
-
-            GameObjects.setKeeperX(GameObjects.getBallCurrentX());
         },
 
         newShot: function () {
-            this.randomNum = Math.round(Math.random());
+            this.randomNum = (Math.random() > 0.3) ? 1 : 0;
             GameObjects.resetBall();
             GameObjects.setKeeperPost(Assets.images().goalkeeper);
         },
