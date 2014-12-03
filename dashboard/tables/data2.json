@@ -1,0 +1,44 @@
+[
+    {
+        "lowerPercentage": 0,
+        "upperPercentage": "Item 0",
+        "fixedProbability": "$0",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 1,
+        "upperPercentage": "Item 1",
+        "fixedProbability": "$1",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 2,
+        "upperPercentage": "Item 2",
+        "fixedProbability": "$2",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 3,
+        "upperPercentage": "Item 3",
+        "fixedProbability": "$3",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 4,
+        "upperPercentage": "Item 4",
+        "fixedProbability": "$4",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 5,
+        "upperPercentage": "Item 5",
+        "fixedProbability": "$5",
+        "usersCount": "$0"
+    },
+    {
+        "lowerPercentage": 6,
+        "upperPercentage": "Item 6",
+        "fixedProbability": "$6",
+        "usersCount": "$0"
+    }
+]
