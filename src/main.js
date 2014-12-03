@@ -1078,35 +1078,51 @@ var ResultScene = (function () {
             var backgroundImageView = new UI.ImageView(0, 0, canvasWidth, canvasHeight, Assets.images().background);
 
             var resultLabelX = canvasWidth / 2;
-            var resultLabelY = canvasHeight * 0.1;
-            // TODO: post owner username
+            var resultLabelY = canvasHeight * 0.75;
+
             var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
-            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You have earned " + score.toString() + " goals for " + Config.getContextName() + "!");
-            resultLabel.font_size = "2";
+            var resultLabel = new UI.Label(resultLabelX, resultLabelY, canvasWidth * 0.9, 60, "You just scored " + score.toString() + " goals for " + Config.getContextName() + "!");
+            resultLabel.font_size = "1.5";
             resultLabel.text_color = "white";
             resultLabel.font_weight = "700";
 
             switch (score) {
                 case 0:
-                    resultLabel.text = "Oops! You have scored no goals for " + Config.getContextName() + ".";
+                    resultLabel.text = "Oops! You just scored no goals for " + Config.getContextName() + ".";
                     resultLabel.text_color = "#efefef";
                     break;
 
                 case 1:
-                    resultLabel.text = "You have scored a goal for " + Config.getContextName() + "!";
+                    resultLabel.text = "You just scored a goal for " + Config.getContextName() + "!";
                     break;
 
                 default:
                     break;
             }
 
-            var dlSectionButtonRatio = Assets.images().ios_dl_section.width / Assets.images().ios_dl_section.height;
+            var appStoreImageRatio = Assets.images().appStore.width / Assets.images().appStore.height;
+            var appStoreImageHeight = canvasHeight * 0.15;
+            var appStoreImageWidth = appStoreImageHeight * appStoreImageRatio;
+            var appStoreImageX = canvasWidth * 0.1;
+            var appStoreImageY = canvasHeight * 0.04;
+            var appStoreButton = new UI.Button(appStoreImageX, appStoreImageY, appStoreImageWidth, appStoreImageHeight);
+            appStoreButton.image = Assets.images().appStore;
+            appStoreButton.label.text = "";
+
+            var playStoreImageRatio = Assets.images().googlePlay.width / Assets.images().googlePlay.height;
+            var playStoreImageWidth = appStoreImageHeight * playStoreImageRatio;
+            var playStoreImageX = canvasWidth * 0.2 + appStoreImageWidth;
+            var playStoreButton = new UI.Button(playStoreImageX, appStoreImageY, playStoreImageWidth, appStoreImageHeight);
+            playStoreButton.image = Assets.images().googlePlay;
+            playStoreButton.label.text = "";
+
+            var dlSectionButtonRatio = Assets.images().download_section.width / Assets.images().download_section.height;
             var dlSectionButtonWidth = canvasWidth * 0.9;
             var dlSectionButtonHeight = dlSectionButtonWidth / dlSectionButtonRatio;
             var dlSectionButtonX = canvasWidth / 2 - dlSectionButtonWidth / 2;
             var dlSectionButtonY = canvasHeight * 0.5 - dlSectionButtonHeight / 2;
             var dlSectionButton = new UI.Button(dlSectionButtonX, dlSectionButtonY, dlSectionButtonWidth, dlSectionButtonHeight);
-            dlSectionButton.image = Assets.images().ios_dl_section;
+            dlSectionButton.image = Assets.images().download_section;
             dlSectionButton.label.text = "";
 
             var shareButtonRatio = Assets.images().share_fb.width / Assets.images().share_fb.height;
@@ -1122,20 +1138,38 @@ var ResultScene = (function () {
                 resultLabel.font_size *= Application.getMobileScale();
                 resultLabel.lineHeight *= Application.getMobileScale();
                 shareButton.label.font_size *= Application.getMobileScale();
-            } else {
-                if (score > 0) {
-                    resultLabel.y = canvasHeight * 0.1;
-                }
-            }
+            } //else {
+            //    if (score > 0) {
+            //        resultLabel.y = canvasHeight * 0.6;
+            //    }
+            //}
 
-            Network.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
-                .success(function (data, xhr) {
-                })
-                .error(function (data, xhr) {
-                });
+            //Network.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+            //    .success(function (data, xhr) {
+            //
+            //    })
+            //    .error(function (data, xhr) {
+            //    });
 
             Network.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
+                    var currentPoints = data.currentPoints || 0;
+                    var remainingPoints = (100 - currentPoints).toString();
+                    var name = Config.getContextName();
+                    if (name === "your friend") {
+                        name = "Your friend";
+                    }
+                    var resultLabelTwo = new UI.Label(resultLabelX, resultLabelY + canvasHeight * 0.1, canvasWidth * 0.9, 60, name + " still needs " + remainingPoints + " goals!");
+                    resultLabelTwo.font_size = "1.5";
+                    resultLabelTwo.text_color = "white";
+                    resultLabelTwo.font_weight = "700";
+
+                    if (Utility.isMobile.any()) {
+                        resultLabelTwo.font_size *= Application.getMobileScale();
+                        resultLabelTwo.lineHeight *= Application.getMobileScale();
+                    }
+
+                    resultLabelTwo.drawView(Application.getCanvasCtx());
                 })
                 .error(function (data, xhr) {
                 });
@@ -1143,6 +1177,55 @@ var ResultScene = (function () {
             this.mainWindow.addSubview(backgroundImageView);
             this.mainWindow.addSubview(resultLabel);
 
+            //var resultLabelTwo = new UI.Label(resultLabelX, resultLabelY + canvasHeight * 0.1, canvasWidth * 0.9, 60, Config.getContextName() + " still needs 98 goals!");
+            //resultLabelTwo.font_size = "2";
+            //resultLabelTwo.text_color = "white";
+            //resultLabelTwo.font_weight = "700";
+
+            if (Utility.isMobile.any()) {
+                var x = (canvasWidth - appStoreImageWidth) / 2;
+                var buttonAction = new UI.Button(0,0, canvasWidth, canvasHeight);
+                buttonAction.label.text = "";
+                buttonAction.alpha = 0;
+
+                if (Utility.isMobile.iOS()) {
+                    appStoreButton.x = x;
+
+                    buttonAction.addTarget(function (sender) {
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                            .success(function (data, xhr) {
+                                console.log("success");
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                        window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
+                    }, "touch");
+
+                    this.mainWindow.addSubview(appStoreButton);
+                } else {
+                    playStoreButton.x = x;
+
+                    buttonAction.addTarget(function (sender) {
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                            .success(function (data, xhr) {
+                                console.log("success");
+                            })
+                            .error(function (data, xhr) {
+                                console.log("error?");
+                            });
+                        window.open("https://play.google.com/store/apps/details?id=com.myhero.fh");
+                    }, "touch");
+
+                    this.mainWindow.addSubview(playStoreButton);
+                }
+                this.mainWindow.addSubview(buttonAction);
+            } else {
+                this.mainWindow.addSubview(appStoreButton);
+                this.mainWindow.addSubview(playStoreButton);
+            }
+
+            //resultLabelTwo.drawView(Application.getCanvasCtx());
 
             if (!shareSection.getIsChecked()) {
                 shareButton.y = dlSectionButtonY;
@@ -1166,30 +1249,6 @@ var ResultScene = (function () {
 
                 this.mainWindow.addSubview(shareButton);
             } else {
-                dlSectionButton.addTarget(function (sender) {
-                    Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                        .success(function (data, xhr) {
-                            console.log("success");
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                    window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
-                }, "touch");
-
-                if (Utility.isMobile.Android()) {
-                    dlSectionButton.image = Assets.images().android_dl_section;
-                    dlSectionButton.addTarget(function (sender) {
-                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
-                            .success(function (data, xhr) {
-                                console.log("success");
-                            })
-                            .error(function (data, xhr) {
-                                console.log("error?");
-                            });
-                        window.open("https://play.google.com/store/apps/details?id=com.myhero.fh");
-                    }, "touch");
-                }
                 this.mainWindow.addSubview(dlSectionButton);
             }
         }
@@ -1529,7 +1588,9 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
+                window.open(Utility.isMobile.iOS()
+                    ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             $(banner).on('touchstart', function () {
@@ -1549,7 +1610,9 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                window.open("https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4");
+                window.open(Utility.isMobile.iOS()
+                    ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
+                    : "https://play.google.com/store/apps/details?id=com.myhero.fh");
             });
 
             if (Utility.isMobile.any()) {
