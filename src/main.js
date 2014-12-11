@@ -1153,7 +1153,13 @@ var ResultScene = (function () {
 
             Network.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
-                    var currentPoints = data.currentPoints || 0;
+
+                    var d = JSON.parse(data);
+                    console.debug(d);
+
+                    console.debug(d.currentPoints);
+                    var currentPoints = d.currentPoints || 0;
+                    console.debug(currentPoints);
                     var remainingPoints = (100 - currentPoints).toString();
                     var name = Config.getContextName();
                     if (name === "your friend") {
