@@ -270,7 +270,7 @@ var ScoreCanvas = (function () {
 
             var engagingText = document.createElement('p');
             engagingText.id = "engaging";
-            engagingText.innerHTML = "Score <b style='font-size: 1em; font-weight: 700'>100 goals</b> to win an iPhone 6!";
+            engagingText.innerHTML = "Score <b style='font-size: 1em; font-weight: 700'>100 goals</b> to win a Galaxy Edge!";
             engagingText.style.fontSize = Config.isMobile() ? '3em' : '2.5em';
             engagingText.style.lineHeight = Config.isMobile() ? '3em' : '2em';
             engagingText.style.color = 'white';
@@ -1010,8 +1010,8 @@ var StartScene = (function () {
             playNowLabel.text_allign = 'left';
 
             var helpTextLabel = new UI.Label(labelsX, labelsY + 10 + 50, 500, 50, "");
-            helpTextLabel.text = "Help " + Config.getContextName() + " win his iPhone 6...";
-            helpTextLabel.font_size = Config.isMobile() ? '2' : '1.5';
+            helpTextLabel.text = "Help " + Config.getContextName() + " win his Galaxy Edge...";
+            helpTextLabel.font_size = Config.isMobile() ? '2' : '1.25';
             helpTextLabel.text_color = 'white';
             helpTextLabel.text_allign = 'left';
 
@@ -1155,11 +1155,7 @@ var ResultScene = (function () {
                 .success(function (data, xhr) {
 
                     var d = JSON.parse(data);
-                    console.debug(d);
-
-                    console.debug(d.currentPoints);
                     var currentPoints = d.currentPoints || 0;
-                    console.debug(currentPoints);
                     var remainingPoints = (100 - currentPoints).toString();
                     var name = Config.getContextName();
                     if (name === "your friend") {
@@ -1190,7 +1186,13 @@ var ResultScene = (function () {
 
             if (Utility.isMobile.any()) {
                 var x = (canvasWidth - appStoreImageWidth) / 2;
-                var buttonAction = new UI.Button(0,0, canvasWidth, canvasHeight);
+                var buttonAction;
+                if (!shareSection.getIsChecked()) {
+                    buttonAction = new UI.Button(x, appStoreButton.y, appStoreButton.width, appStoreButton.height);
+                } else {
+                    buttonAction= new UI.Button(0,0, canvasWidth, canvasHeight);
+                }
+
                 buttonAction.label.text = "";
                 buttonAction.alpha = 0;
 
@@ -1681,7 +1683,7 @@ var shareSection = (function () {
             popCon.className = "cd-popup-container";
             popCon.style.width = Config.isMobile() ? '90%' : '40%';
             var msg = document.createElement("p");
-            msg.innerHTML = "Are you sure you don't want to win an iPhone 6?!";
+            msg.innerHTML = "Are you sure you don't want to win a Galaxy Edge?!";
             var ul = document.createElement("ul");
             ul.className = "cd-buttons";
             var yesButton = document.createElement("li");
