@@ -29,6 +29,8 @@
         Config.setContextName("Your Friend");
         Config.setHostURI("http://192.168.1.92:44333/");
         Config.prepareGameResult(1.0);
+        Config.setTargetPoints(50);
+        Config.setGrandPrize("Samsung Galaxy Edge");
 
         //call from client
         Assets.initialise({
@@ -63,7 +65,46 @@
             Banner.setUpContent(document.getElementById("banner"));
             BannerTwo.setUpContent(document.getElementById("bannerTwo"));
         });
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '772954419408981',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.2'
+            });
+        };
+
+        // Load the SDK asyn
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function publish() {
+            var feed = {
+                method: 'feed',
+                picture: 'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/FB-Share-New-Normal-2.png',
+                link: 'https://192.168.1.39:8000/game.html',
+                message: 'Help me score 50 goals to win Samsung Note Edge! #FootballHero',
+                name: 'Play FootballHero Penalty Kick now on Facebook to help your friend !',
+                description: 'Get your own chance to win Samsung Note Edge!',
+                caption: 'FootballHero'
+            };
+
+            function callback(response) {
+                if (response && response.post_id !== undefined) {
+                    alert('published');
+                }
+            }
+
+            FB.ui(feed, callback);
+        }
     </script>
+    <button id="publish" onclick="publish()">Click</button>
 
     <!--<a href="#0" class="cd-popup-trigger">View Pop-up</a>-->
     <!--<p id="content">Help Ryne to win an iPhone 6</p>-->

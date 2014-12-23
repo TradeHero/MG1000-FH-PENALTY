@@ -26,6 +26,8 @@ var Config = (function () {
     var _contextName = null;
     var _hostURI = null;
     var _maxAllowableGoals = null;
+    var _grandPrize = null;
+    var _targetPoints = null;
 
     // public interface
     return {
@@ -49,6 +51,18 @@ var Config = (function () {
         },
         isMobile: function () {
             return Utility.isMobile.any();
+        },
+        setGrandPrize: function (p) {
+            _grandPrize = p;
+        },
+        getGrandPrize: function () {
+            return _grandPrize;
+        },
+        setTargetPoints: function (t) {
+            _targetPoints = t;
+        },
+        getTargetPoints:function () {
+            return _targetPoints;
         }
     }
 
@@ -119,11 +133,25 @@ var Application = (function () {
             var startTouchX = 0;
             var startTouchY = 0;
             var startTime = 0;
+            var go = GameObjects;
+            var isClickForStart = true;
 
             // listen for clicks
             this.canvas.addEventListener('click', function (e) {
                 e.preventDefault();
                 Input.trigger(e);
+
+                if (!isClickForStart) {
+                    var duration = Math.floor(Math.random() * (800 - 100)) + 100;
+                    if (Application.getIsGameStart() && !Utility.isMobile.any()) {
+                        Input.drag(go.getBallStartX(), go.getBallStartY(),
+                            (e.pageX - Application.getCanvas().offsetLeft), (e.pageY - Application.getCanvas().offsetTop), duration);
+                    }
+                }
+
+                if (Application.getIsGameStart()) {
+                    isClickForStart = false;
+                }
             }, false);
 
             // listen for touches
@@ -154,29 +182,29 @@ var Application = (function () {
 
             }, false);
 
-            this.canvas.addEventListener('mousedown', function (e) {
-                e.preventDefault();
-                // first touch from the event
-                //INPUT.trigger(e.touches[0]);
-
-                if (Application.getIsGameStart()) {
-                    startTouchX = e.pageX;
-                    startTouchY = e.pageY;
-                    startTime = Date.now();
-                }
-            }, false);
-
-            this.canvas.addEventListener('mouseup', function (e) {
-                // as above
-                e.preventDefault();
-                if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
-                    if (Application.getIsGameStart()) {
-                        var duration = Date.now() - startTime;
-                        Input.drag(startTouchX, startTouchY, e.pageX, e.pageY, duration);
-                    }
-                }
-
-            }, false);
+            //this.canvas.addEventListener('mousedown', function (e) {
+            //    e.preventDefault();
+            //    // first touch from the event
+            //    //INPUT.trigger(e.touches[0]);
+            //
+            //    if (Application.getIsGameStart()) {
+            //        startTouchX = e.pageX;
+            //        startTouchY = e.pageY;
+            //        startTime = Date.now();
+            //    }
+            //}, false);
+            //
+            //this.canvas.addEventListener('mouseup', function (e) {
+            //    // as above
+            //    e.preventDefault();
+            //    if (startTouchX !== e.pageX || startTouchY !== e.pageY) {
+            //        if (Application.getIsGameStart()) {
+            //            var duration = Date.now() - startTime;
+            //            Input.drag(startTouchX, startTouchY, e.pageX, e.pageY, duration);
+            //        }
+            //    }
+            //
+            //}, false);
 
             Assets.beginLoad();
         },
@@ -270,8 +298,8 @@ var ScoreCanvas = (function () {
 
             var engagingText = document.createElement('p');
             engagingText.id = "engaging";
-            engagingText.innerHTML = "Score <b style='font-size: 1em; font-weight: 700'>100 goals</b> to win a Galaxy Edge!";
-            engagingText.style.fontSize = Config.isMobile() ? '3em' : '2.5em';
+            engagingText.innerHTML = "Score <b style='font-size: 1em; font-weight: 700'>"+ Config.getTargetPoints() +" goals</b> to win a "+ Config.getGrandPrize() +"!";
+            engagingText.style.fontSize = Config.isMobile() ? '2.5em' : '2em';
             engagingText.style.lineHeight = Config.isMobile() ? '3em' : '2em';
             engagingText.style.color = 'white';
             engagingText.style.fontWeight = '400';
@@ -410,6 +438,7 @@ var Renderer = (function () {
             ball.image = ballImage;
             ball.label.text = "";
             ball.alpha = GameObjects.getBallAlpha();
+
             this.mainWindow.addSubview(ball);
         },
 
@@ -625,6 +654,7 @@ var GameObjects = (function () {
             var dy = this.getDragEndY() - this.getDragStartY();
             var distance = Math.sqrt(dx * dx + dy * dy);
 
+            console.log(this.getDragDuration());
             var velocity = distance / this.getDragDuration();
 
             if (velocity < 0.8) {
@@ -1010,7 +1040,7 @@ var StartScene = (function () {
             playNowLabel.text_allign = 'left';
 
             var helpTextLabel = new UI.Label(labelsX, labelsY + 10 + 50, 500, 50, "");
-            helpTextLabel.text = "Help " + Config.getContextName() + " win his Galaxy Edge...";
+            helpTextLabel.text = "Help " + Config.getContextName() + " win the prize!";
             helpTextLabel.font_size = Config.isMobile() ? '2' : '1.25';
             helpTextLabel.text_color = 'white';
             helpTextLabel.text_allign = 'left';
@@ -1156,7 +1186,7 @@ var ResultScene = (function () {
 
                     var d = JSON.parse(data);
                     var currentPoints = d.currentPoints || 0;
-                    var remainingPoints = (100 - currentPoints).toString();
+                    var remainingPoints = (Config.getTargetPoints() - currentPoints).toString();
                     var name = Config.getContextName();
                     if (name === "your friend") {
                         name = "Your friend";
@@ -1683,7 +1713,7 @@ var shareSection = (function () {
             popCon.className = "cd-popup-container";
             popCon.style.width = Config.isMobile() ? '90%' : '40%';
             var msg = document.createElement("p");
-            msg.innerHTML = "Are you sure you don't want to win a Galaxy Edge?!";
+            msg.innerHTML = "Are you sure you don't want to win a "+ Config.getGrandPrize() +"?!";
             var ul = document.createElement("ul");
             ul.className = "cd-buttons";
             var yesButton = document.createElement("li");
