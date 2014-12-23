@@ -2,57 +2,130 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <!--<meta name="apple-itunes-app" content="app-id=859894802"/>-->
     <title></title>
-    <!--<script type="application/javascript" src="dist/mg2-html-v0.0.1.min.js"></script>-->
-    <!--<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>-->
+
+    <link href="css/reset.css" rel="stylesheet"/>
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet"/>
+    <link href="css/main.css" rel="stylesheet"/>
+
+    <script type="application/javascript"
+            src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 </head>
-<body>
+<body id="body">
+<div class="container" id="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12 banner-container" id="top-banner">
+            <a href="#" id="top-banner-link"><img id="top-banner-image" class="banner"
+                                                  src="http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-apple.png"/></a>
+        </div>
+    </div>
 
-    <script>
-        function statusChangeCallback(response) {
-            var uri = encodeURI('http://192.168.1.91:8000/game.html');
+    <div style="background-image: url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-score-760x119.png'); background-size: cover; height: 119px; border-color: transparent;"
+         class="row"><p style="font-size: 2em; line-height: 2em; color: white; font-weight: 400;" id="engaging">Score
+        <b style="font-size: 1em; font-weight: 700">50 goals</b> to win a Samsung Galaxy Edge!</p>
 
-            if (response.status === 'connected') {
-                // redirect user to mini game.
-                window.location.href = uri + "?access_token=" + response["authResponse"]["accessToken"]
-            } else if (response.status === 'not_authorized') {
-                // The person is logged into Facebook, but not your app.
-                window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
-            } else {
-                // The person is not logged into Facebook, so we're not sure if
-                // they are logged into this app or not.
-                window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
-            }
+        <p style="font-size: 1.5em; color: white; font-weight: 400;" id="engagingSupp">Play from now to <b
+                style="font-size: 1em; font-weight: 700">December 31st!</b>
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12" id="main-content">
+            <button id="fbAuthButton" class="center-block" onclick="checkLoginState()">
+                <p class="lead" style="color: #ffffff; font-family: 'Roboto', sans-serif"><b>Play Now!</b></p>
+                <p class="lead" style="color: #ffffff; font-family: 'Roboto', sans-serif">Help Your Friend win the prize!</p>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12 banner-container" id="bottom-banner">
+            <a href="#" id="bottom-banner-link"><img id="bottom-banner-image" class="banner"
+                                                     src="http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-google.png"/></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    var container = $("#container");
+    var container_width = parseInt(container.css("width"));
+
+    /// set up main content size
+    var main_content = $("#main-content");
+    var main_content_bg = new Image();
+    main_content_bg.src = "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png";
+
+    var main_content_bg_ratio = main_content_bg.width / main_content_bg.height;
+    main_content_bg.width = container_width;
+    main_content_bg.height = main_content_bg.width / main_content_bg_ratio;
+    main_content.height(main_content_bg.height);
+    main_content.css({
+        "background-image": "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/full_background.png')",
+        "background-size": container_width.toString()+"px "+main_content.height().toString()+"px"
+    });
+
+    /// set up play button size
+    var playButton = $("#fbAuthButton");
+    var playButton_bg = new Image();
+    playButton_bg.src = "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png";
+
+    var playButton_bg_ratio = playButton_bg.width / playButton_bg.height;
+    playButton.width(container_width * 0.7);
+    playButton.height(playButton.width() / playButton_bg_ratio);
+    playButton.css({
+        "background-image": "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/playNowButton.png')",
+        "background-size": playButton.width().toString()+"px "+playButton.height().toString()+"px",
+        "background-repeat": "no-repeat",
+        "background-color": "transparent",
+        "border" : "0"
+    });
+
+    function statusChangeCallback(response) {
+        var uri = encodeURI('http://192.168.1.39:8000/game.html');
+
+        if (response.status === 'connected') {
+            // redirect user to mini game.
+            window.location.href = uri + "?access_token=" + response["authResponse"]["accessToken"]
+        } else if (response.status === 'not_authorized') {
+            // The person is logged into Facebook, but not your app.
+            window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
+        } else {
+            // The person is not logged into Facebook, so we're not sure if
+            // they are logged into this app or not.
+            window.location = encodeURI("https://www.facebook.com/v2.2/dialog/oauth?client_id=772954419408981&redirect_uri=" + uri + "&scope=email,publish_actions&response_type=token");
         }
+    }
 
-        function checkLoginState() {
-            FB.getLoginStatus(function (response) {
-                statusChangeCallback(response);
-            });
+    function checkLoginState() {
+        FB.getLoginStatus(function (response) {
+            statusChangeCallback(response);
+        });
+    }
+
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '772954419408981',
+            cookie: true,
+            xfbml: true,
+            version: 'v2.2'
+        });
+
+//            FB.getLoginStatus(function (response) {
+//                statusChangeCallback(response);
+//            });
+    };
+
+    // Load the SDK asyn
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
         }
-
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '772954419408981',
-                cookie: true,
-                xfbml: true,
-                version: 'v2.2'
-            });
-
-            FB.getLoginStatus(function (response) {
-                statusChangeCallback(response);
-            });
-        };
-
-        // Load the SDK asyn
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement(s); js.id = id;
-            js.src = "//connect.facebook.net/en_US/sdk.js";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
 </body>
 </html>
