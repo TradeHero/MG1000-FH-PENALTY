@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="lib/uuid.js"></script>
+    <script>
+        //UniqueIdCookieManager.deleteCookie("fh-penalty-kick");
+
+
+        if (!UniqueIdCookieManager.cookieExistForName("fh-penalty-kick")){
+            UniqueIdCookieManager.setCookie("fh-penalty-kick");
+        }
+
+        var guid = UniqueIdCookieManager.getCookie("fh-penalty-kick");
+        console.debug(guid);
+    </script>
+</head>
+<body>
+
+</body>
+</html>
