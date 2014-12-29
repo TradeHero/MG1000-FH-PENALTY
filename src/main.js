@@ -69,10 +69,10 @@ var Config = (function () {
 })();
 
 var URLConfig = (function () {
-    var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?access_token=";
-    var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?access_token=";
+    var _shareToFB = "api/PenaltyKick/fhpenalty/FacebookShare?guid=";
+    var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?guid=";
     var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?egg=";
-    var _postEggResultToFB = "api/PenaltyKick/fhpenalty/PostEggResultToFB?access_token=";
+    var _postEggResultToFB = "api/PenaltyKick/fhpenalty/PostEggResultToFB?guid=";
     return {
         getShareToFBApi: function () {
             return Config.getHostURI() + _shareToFB;
@@ -81,7 +81,7 @@ var URLConfig = (function () {
             return Config.getHostURI() + _recordPoints;
         },
         getRecordDownload: function () {
-            return Config.getHostURI() + _recordDownload+getURLParameter("egg")+"&access_token=";
+            return Config.getHostURI() + _recordDownload+getURLParameter("egg")+"&guid=";
         },
         getPostEggResultToFB: function () {
             return Config.getHostURI() + _postEggResultToFB;
@@ -1059,15 +1059,15 @@ var StartScene = (function () {
                 document.getElementById('absolcenter').removeChild(document.getElementById("bluediv"));
                 ScoreCanvas.getCanvas().style.display = "block";
 
-                if (shareSection.getIsChecked()) {
-                    Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                        .success(function (data, xhr) {
-                            console.log("success");
-                        })
-                        .error(function (data, xhr) {
-                            console.log("error?");
-                        });
-                }
+                //if (shareSection.getIsChecked()) {
+                //    Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                //        .success(function (data, xhr) {
+                //            console.log("success");
+                //        })
+                //        .error(function (data, xhr) {
+                //            console.log("error?");
+                //        });
+                //}
 
                 Application.setIsGameStart(true);
                 Input.resetRegisterControls();
@@ -1174,14 +1174,14 @@ var ResultScene = (function () {
             //    }
             //}
 
-            //Network.get(URLConfig.getPostEggResultToFB() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+            //Network.get(URLConfig.getPostEggResultToFB() + getURLParameter("guid") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
             //    .success(function (data, xhr) {
             //
             //    })
             //    .error(function (data, xhr) {
             //    });
 
-            Network.get(URLConfig.getRecordPointsApi() + getURLParameter("access_token") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+            Network.get(URLConfig.getRecordPointsApi() + getURLParameter("guid") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
                 .success(function (data, xhr) {
 
                     var d = JSON.parse(data);
@@ -1230,7 +1230,7 @@ var ResultScene = (function () {
                     appStoreButton.x = x;
 
                     buttonAction.addTarget(function (sender) {
-                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                             .success(function (data, xhr) {
                                 console.log("success");
                             })
@@ -1245,7 +1245,7 @@ var ResultScene = (function () {
                     playStoreButton.x = x;
 
                     buttonAction.addTarget(function (sender) {
-                        Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                        Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                             .success(function (data, xhr) {
                                 console.log("success");
                             })
@@ -1272,17 +1272,17 @@ var ResultScene = (function () {
                     sender.image = Assets.images().share_fb_succeed;
                     sender.drawView(Application.getCanvasCtx());
 
-                    if (!shareSection.getIsChecked()) {
-                        Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                            .success(function (data, xhr) {
-                                sender.enabled = false;
-                                sender.image = Assets.images().share_fb_succeed;
-                                sender.drawView(Application.getCanvasCtx());
-                            })
-                            .error(function (data, xhr) {
-                                console.log("error?");
-                            });
-                    }
+                    //if (!shareSection.getIsChecked()) {
+                    //    Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                    //        .success(function (data, xhr) {
+                    //            sender.enabled = false;
+                    //            sender.image = Assets.images().share_fb_succeed;
+                    //            sender.drawView(Application.getCanvasCtx());
+                    //        })
+                    //        .error(function (data, xhr) {
+                    //            console.log("error?");
+                    //        });
+                    //}
                 }, "touch");
 
                 this.mainWindow.addSubview(shareButton);
@@ -1528,7 +1528,7 @@ var Banner = (function () {
             //
 
             $(banner).on('click', function () {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1536,13 +1536,13 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
+                //Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                //    .success(function (data, xhr) {
+                //        console.log("success");
+                //    })
+                //    .error(function (data, xhr) {
+                //        console.log("error?");
+                //    });
 
                 window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
@@ -1550,7 +1550,7 @@ var Banner = (function () {
             });
 
             $(banner).on('touchstart', function () {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1558,13 +1558,13 @@ var Banner = (function () {
                         console.log("error?");
                     });
 
-                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
+                //Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                //    .success(function (data, xhr) {
+                //        console.log("success");
+                //    })
+                //    .error(function (data, xhr) {
+                //        console.log("error?");
+                //    });
 
                 window.open(!Utility.isMobile.Android()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
@@ -1610,7 +1610,7 @@ var BannerTwo = (function () {
                 : 'url(\'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/bottom-banner-google.png\')';
 
             $(banner).on('click', function () {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1618,13 +1618,13 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
+                //Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                //    .success(function (data, xhr) {
+                //        console.log("success");
+                //    })
+                //    .error(function (data, xhr) {
+                //        console.log("error?");
+                //    });
 
                 window.open(Utility.isMobile.iOS()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
@@ -1632,7 +1632,7 @@ var BannerTwo = (function () {
             });
 
             $(banner).on('touchstart', function () {
-                Network.get(URLConfig.getRecordDownload() + getURLParameter("access_token"))
+                Network.get(URLConfig.getRecordDownload() + getURLParameter("guid"))
                     .success(function (data, xhr) {
                         console.log("success");
                     })
@@ -1640,13 +1640,13 @@ var BannerTwo = (function () {
                         console.log("error?");
                     });
 
-                Network.get(URLConfig.getShareToFBApi() + getURLParameter("access_token") + "&egg=" + getURLParameter("egg"))
-                    .success(function (data, xhr) {
-                        console.log("success");
-                    })
-                    .error(function (data, xhr) {
-                        console.log("error?");
-                    });
+                //Network.get(URLConfig.getShareToFBApi() + getURLParameter("guid") + "&egg=" + getURLParameter("egg"))
+                //    .success(function (data, xhr) {
+                //        console.log("success");
+                //    })
+                //    .error(function (data, xhr) {
+                //        console.log("error?");
+                //    });
 
                 window.open(Utility.isMobile.iOS()
                     ? "https://itunes.apple.com/sg/app/footballhero-sports-prediction/id859894802?mt=8&uo=4"
