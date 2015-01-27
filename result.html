@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link href="css/reset.css" rel="stylesheet"/>
+    <link href="css/bootstrap/bootstrap.css" rel="stylesheet"/>
+    <link href="css/main.css" rel="stylesheet"/>
+    <script type="application/javascript"
+            src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body id="body">
+<div class="container" id="container">
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12 banner-container" id="top-banner">
+            <a href="#" id="top-banner-link"><img id="top-banner-image" class="banner"
+                                                  src="http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-apple.png"/></a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12" id="main-content">
+            <button id="fbSharingButton" class="center-block" onclick="shareToFb()">
+            </button>
+
+            <p style="margin-top: 10%; color: #ffffff; font-size: 2em" id="scoreText" class="lead text-center">
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12 banner-container" id="bottom-banner">
+            <a href="#" id="bottom-banner-link"><img id="bottom-banner-image" class="banner"
+                                                     src="http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/top-banner-google.png"/></a>
+        </div>
+    </div>
+    <script>
+        var container = $("#container");
+        var container_width = parseInt(container.css("width"));
+        /// set up main content size
+        var main_content = $("#main-content");
+        var main_content_bg = new Image();
+        main_content_bg.src = "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png";
+        var main_content_bg_ratio = main_content_bg.width / main_content_bg.height;
+        main_content_bg.width = container_width;
+        main_content_bg.height = main_content_bg.width / main_content_bg_ratio;
+        main_content.height(main_content_bg.height);
+        main_content.css({
+            "background-image": "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/img-bkg.png')",
+            "background-size": container_width.toString() + "px " + main_content.height().toString() + "px"
+        });
+        /// set up play button size
+        var shareButton = $("#fbSharingButton");
+        var shareButton_bg = new Image();
+        shareButton_bg.src = "http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png";
+        var playButton_bg_ratio = shareButton_bg.width / shareButton_bg.height;
+        shareButton.width(container_width * 0.7);
+        shareButton.height(shareButton.width() / playButton_bg_ratio);
+        shareButton.css({
+            "background-image": "url('http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/share-fb.png')",
+            "background-size": shareButton.width().toString() + "px " + shareButton.height().toString() + "px",
+            "background-repeat": "no-repeat",
+            "background-color": "transparent",
+            "border": "0"
+        });
+
+        var score = getURLParameter("score");
+        var resultLabel = $("#scoreText");
+
+        switch (score) {
+            case '0':
+                resultLabel.html("<strong>Oops! You just scored no goals for your friend.</strong>");
+                break;
+
+            case '1':
+                resultLabel.html("<strong>You just scored a goal for your friend!</strong>");
+                break;
+
+            case '2':
+            case '3':
+                console.log(resultLabel);
+                resultLabel.html("<strong>You just scored " + score + " goals for your friend!</strong>");
+                break;
+
+            default:
+                break;
+        }
+
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '772954419408981',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.2'
+            });
+        };
+
+        // Load the SDK asyn
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function shareToFb() {
+            FB.ui({
+                method: 'feed',
+                link: 'http://192.168.1.18:8000/game.html',
+                caption: 'FootballHero',
+                picture: 'http://portalvhdskgrrf4wksb8vq.blob.core.windows.net/fh-penalty/FB-Share-New-Cartoon.png',
+                name: 'Play FootballHero Penalty Kick now on Facebook to help your friend !',
+                description: 'FootballHero is the hottest social prediction game where you can win prizes like Messi & Ronaldo Signed jerseys by guessing the correct outcome. And it’s FREE!!! Play now on Facebook, help your friend :)'
+            }, function (response) {
+            });
+        }
+
+        function getURLParameter(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
+        }
+    </script>
+</div>
+</body>
+</html>

@@ -73,6 +73,7 @@ var URLConfig = (function () {
     var _recordPoints = "api/PenaltyKick/fhpenalty/RecordEggPoints?guid=";
     var _recordDownload = "api/PenaltyKick/fhpenalty/RecordEggAppDownload?egg=";
     var _postEggResultToFB = "api/PenaltyKick/fhpenalty/PostEggResultToFB?guid=";
+    var _resultPageLink = "PenaltyKick/Result?guid=";
     return {
         getShareToFBApi: function () {
             return Config.getHostURI() + _shareToFB;
@@ -85,6 +86,9 @@ var URLConfig = (function () {
         },
         getPostEggResultToFB: function () {
             return Config.getHostURI() + _postEggResultToFB;
+        },
+        getResultPageLink: function () {
+            return Config.getHostURI() + _resultPageLink;
         }
     }
 })();
@@ -462,7 +466,7 @@ var Renderer = (function () {
             var gameOverText = new UI.Label(Application.getCanvasWidth() / 2, Application.getCanvasHeight() / 2, Application.getCanvasWidth() / 2, 50, "Need to show share dialog");
             gameOverText.font_size = "5";
             gameOverText.text_color = "red";
-            this.mainWindow.addSubview(gameOverText);
+            //this.mainWindow.addSubview(gameOverText);
         },
 
         renderScore: function () {
@@ -1385,7 +1389,34 @@ var Game = (function () {
 
             if (GameObjects.getCurrentKick() === 3) {
                 Renderer.renderGameOver();
-                ResultScene.init();
+                //ResultScene.init();
+                var score = GameObjects.getScores()[0] + GameObjects.getScores()[1] + GameObjects.getScores()[2];
+                Network.get(URLConfig.getRecordPointsApi() + getURLParameter("guid") + '&egg=' + getURLParameter("egg") + '&points=' + score.toString())
+                    .success(function (data, xhr) {
+
+                        //var d = JSON.parse(data);
+                        //var currentPoints = d.currentPoints || 0;
+                        //var remainingPoints = (Config.getTargetPoints() - currentPoints).toString();
+                        //var name = Config.getContextName();
+                        //if (name === "your friend") {
+                        //    name = "Your friend";
+                        //}
+                        //var resultLabelTwo = new UI.Label(resultLabelX, resultLabelY + canvasHeight * 0.1, canvasWidth * 0.9, 60, name + " still needs " + remainingPoints + " goals!");
+                        //resultLabelTwo.font_size = "1.5";
+                        //resultLabelTwo.text_color = "white";
+                        //resultLabelTwo.font_weight = "700";
+                        //
+                        //if (Utility.isMobile.any()) {
+                        //    resultLabelTwo.font_size *= Application.getMobileScale();
+                        //    resultLabelTwo.lineHeight *= Application.getMobileScale();
+                        //}
+
+                        //resultLabelTwo.drawView(Application.getCanvasCtx());
+                    })
+                    .error(function (data, xhr) {
+                    });
+
+                window.location.href = URLConfig.getResultPageLink() + getURLParameter("guid") + "&egg=" + getURLParameter("egg") + "&score=" + score;
             } else {
                 Renderer.renderBall();
                 Renderer.renderScore();
